@@ -75,7 +75,7 @@ internal class Program
 
 
 
-        builder.Services.AddIdentity<AppUser, IdentityRole>(
+        builder.Services.AddIdentity<AppUser, UserRole>(
                     options =>
                     {
                         options.User.RequireUniqueEmail = true;
