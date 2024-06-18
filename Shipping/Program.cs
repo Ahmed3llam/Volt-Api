@@ -16,6 +16,46 @@ internal class Program
 
         // Add services to the container.
 
+
+        #region for Swagger Doc To Allow sending Token 
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
+                Title = "Shipping System API",
+                Version = "v1"
+            });
+
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+                Description = "Here Enter JWT Token with bearer format like bearer [space] token"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        {
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
+        });
+        #endregion
+
+
+
+
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
@@ -23,43 +63,28 @@ internal class Program
 
         builder.Services.AddEndpointsApiExplorer();
 
-        builder.Services.AddSwaggerGen(
-                o =>
-                {
-                    o.SwaggerDoc("v1", new OpenApiInfo()
-                    {
-                        Title = "Shipping Api",
-                        Description = " Api To Manage Shipping System For Pioneer",
-                        Version = "v1",
-                        TermsOfService = new Uri("http://tempuri.org/terms"),
-                        Contact = new OpenApiContact
-                        {
-                            Name = "",
-                            Email = "",
 
-                        },
-                    });
-                    //o.IncludeXmlComments("");
-                    o.EnableAnnotations();
-                }
-            );
+
+     
 
         builder.Services.AddDbContext<ShippingContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("Db"));
-            options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("Db"));
+            //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
 
-        //builder.Services.AddIdentity<User, IdentityRole>(
-        //            options =>
-        //            {
-        //                options.User.RequireUniqueEmail = true;
-        //                options.Password.RequireNonAlphanumeric = false;
-        //                options.Password.RequireDigit = false;
-        //                options.Password.RequireUppercase = false;
-        //                options.Password.RequireLowercase = false;
-        //                options.Password.RequiredLength = 8;
-        //            }).AddEntityFrameworkStores<ShippingContext>();
+
+
+        builder.Services.AddIdentity<AppUser, IdentityRole>(
+                    options =>
+                    {
+                        options.User.RequireUniqueEmail = true;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireDigit = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireLowercase = false;
+                        options.Password.RequiredLength = 8;
+                    }).AddEntityFrameworkStores<ShippingContext>();
 
         builder.Services.AddCors(options =>
         {
@@ -72,7 +97,14 @@ internal class Program
             });
         });
 
-        builder.Services.AddScoped<Unit>();
+
+        #region register UnitOfWork & Configuration & myServices 
+        builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+
+        //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
+        
+        #endregion
 
         builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
                     .AddJwtBearer("schema",
@@ -90,7 +122,15 @@ internal class Program
                     }
                     );
 
+        //use autoMapper
+        builder.Services.AddAutoMapper(typeof(Program));
+
+
         var app = builder.Build();
+
+
+
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

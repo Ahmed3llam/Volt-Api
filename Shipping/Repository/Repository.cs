@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Shipping.Repository
 {
-    public class Repository<TEntity> where TEntity : class
+    public class Repository<TEntity> :IRepository<TEntity> where TEntity : class
     {
         ShippingContext db;
         DbSet<TEntity> set; 
@@ -90,5 +90,7 @@ namespace Shipping.Repository
         {
             db.SaveChanges();
         }
+
+
     }
 }
