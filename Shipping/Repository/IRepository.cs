@@ -5,25 +5,25 @@ namespace Shipping.Repository
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        public List<TEntity> GetAll(params Expression<Func<TEntity, object>>[] includeProperties);
+        public Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includeProperties);
         
-        public List<TEntity> Pagination(List<TEntity> List, int page = 1, int pageSize = 9);
+        public Task<List<TEntity>> PaginationAsync(List<TEntity> List, int page = 1, int pageSize = 9);
        
-        public List<TEntity> GetByTitle(string name, params Expression<Func<TEntity, object>>[] includeProperties);
+        public Task<List<TEntity>> GetByTitleAsync(string name, params Expression<Func<TEntity, object>>[] includeProperties);
         
-        public bool Exist(int id);
+        public Task<bool> ExistAsync(int id);
         
-        public TEntity GetById(int id, params Expression<Func<TEntity, object>>[] includeProperties);
+        public Task<TEntity> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties);
         
 
 
-        public void Add(TEntity entity);
+        public Task AddAsync(TEntity entity);
       
-        public void Update(TEntity entity);
+        public Task UpdateAsync(TEntity entity);
       
-        public void Delete(int id);
+        public Task DeleteAsync(int id);
         
-        public void Save();
+        public Task SaveAsync();
        
 
 

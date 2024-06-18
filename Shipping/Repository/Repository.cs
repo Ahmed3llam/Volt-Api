@@ -14,7 +14,7 @@ namespace Shipping.Repository
             this.db = db;
             set = this.db.Set<TEntity>();
         }
-        public List<TEntity> GetAll(params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<List<TEntity>> GetAllAsync(params Expression<Func<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = set;
             foreach (var includeProperty in includeProperties)
@@ -23,12 +23,12 @@ namespace Shipping.Repository
             }
             return query.ToList();
         }
-        public List<TEntity> Pagination(List<TEntity> List, int page = 1, int pageSize = 9)
+        public async Task<List<TEntity>> PaginationAsync(List<TEntity> List, int page = 1, int pageSize = 9)
         {
             IQueryable<TEntity> query = set;
             return query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
         }
-        public List<TEntity> GetByTitle(string name, params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<List<TEntity>> GetByTitleAsync(string name, params Expression<Func<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = set;
             foreach (var includeProperty in includeProperties)
@@ -37,7 +37,7 @@ namespace Shipping.Repository
             }
             return query.Where(entity => EF.Property<string>(entity, "Title") == name).ToList();
         }
-        public bool Exist(int id)
+        public async Task<bool> ExistAsync(int id)
         {
             IQueryable<TEntity> query = set;
             var entityIdProperty = typeof(TEntity).GetProperty("Id");
@@ -52,7 +52,7 @@ namespace Shipping.Repository
             }
             throw new InvalidOperationException("Entity does not contain properties named 'Id'.");
         }
-        public TEntity GetById(int id, params Expression<Func<TEntity, object>>[] includeProperties)
+        public async Task<TEntity> GetByIdAsync(int id, params Expression<Func<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> query = set;
             foreach (var includeProperty in includeProperties)
@@ -73,20 +73,20 @@ namespace Shipping.Repository
         }
 
 
-        public void Add(TEntity entity)
+        public async Task AddAsync(TEntity entity)
         {
             db.Set<TEntity>().Add(entity);
         }
-        public void Update(TEntity entity)
+        public async Task UpdateAsync(TEntity entity)
         {
             db.Entry(entity).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
         }
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             TEntity obj = db.Set<TEntity>().Find(id);
             db.Set<TEntity>().Remove(obj);
         }
-        public void Save()
+        public async Task SaveAsync()
         {
             db.SaveChanges();
         }
