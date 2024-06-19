@@ -29,7 +29,7 @@ namespace Shipping.Models
         public bool IsDeleted { get; set; } = false;
         public int ShippingCost { get; set; }
         public int TotalCost => OrderCost + ShippingCost;
-
+        public int GovernmentId { get; set; }
 
         public string StreetName { get; set; }
         public string? Notes { get; set; }
