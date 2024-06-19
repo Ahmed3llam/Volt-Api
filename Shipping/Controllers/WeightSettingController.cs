@@ -65,7 +65,7 @@ namespace Shipping.Controllers
             try
             {
                 await _WeightSettingUnit.Repository.UpdateAsync(ws);
-                //ليه مش شغالة
+                 _WeightSettingUnit.SaveChanges();
             }
             catch(Exception ex) 
             {

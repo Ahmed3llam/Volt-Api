@@ -51,15 +51,9 @@ namespace Shipping.AutoMapperProfiles
             CreateMap<UserRole, UserRoleDTO>()
             .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.roleName, opt => opt.MapFrom(src => src.Name))
-            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.Date))
+            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.Date)).ReverseMap()
             ;
-            // Mapping from UserRoleDTO to UserRole (reverse direction)
-            CreateMap<UserRoleDTO, UserRole>()
-           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.id))
-            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.roleName))
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.date))
-            ;
-
+       
             #endregion
 
 
