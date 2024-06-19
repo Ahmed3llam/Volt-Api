@@ -100,10 +100,13 @@ internal class Program
 
         #region register UnitOfWork & Configuration & myServices 
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+        builder.Services.AddScoped<IUnitOfWork<Order>, UnitOfWork<Order>>();
+        builder.Services.AddScoped<IUnitOfWork<City>, UnitOfWork<City>>();
+        builder.Services.AddScoped<IUnitOfWork<Government>, UnitOfWork<Government>>();
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
-        
+
         #endregion
 
         builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")

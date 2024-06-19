@@ -15,18 +15,12 @@ namespace Shipping.Repository.OrderRepo
     public class OrderRepository : IOrderRepository
     {
         private readonly ShippingContext _myContext;
-        private readonly IGovernmentRepository _governmentRepository;
-        private readonly ICityRepository _cityRepository;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWeightSettingRepository _weightSettingRepository;
+    
 
-        public OrderRepository(ShippingContext myContext,IGovernmentRepository governmentRepository , ICityRepository cityRepository,   UserManager<ApplicationUser> userManager, IWeightSettingRepository weightSettingRepository)
+        public OrderRepository(ShippingContext myContext)
         {
             _myContext = myContext;
-            _cityRepository = cityRepository;
-            _governmentRepository = governmentRepository;
-            _userManager = userManager;
-            _weightSettingRepository = weightSettingRepository;
+  
         }
 
         public async Task<List<OrderDTO>> GetAllOrdersAsync()
