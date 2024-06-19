@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shipping.DTO;
 using Shipping.Models;
 
 namespace Shipping.AutoMapperProfiles
@@ -29,6 +30,35 @@ namespace Shipping.AutoMapperProfiles
             //.ForMember(dest => dest.Stock, opt => opt.MapFrom(src => src.stock))
             //.ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.categoryId))
             //;
+
+            #endregion
+
+
+            #region from WeightSetting to WeightSettingDTO
+            CreateMap<WeightSetting, WeightSettingDTO>()
+            .ForMember(dest => dest.standaredWeight, opt => opt.MapFrom(src => src.StandaredWeight))
+            .ForMember(dest => dest.addition_Cost, opt => opt.MapFrom(src => src.Addition_Cost))
+            ;
+            // Mapping from WeightSettingDTO to WeightSetting (reverse direction)
+            CreateMap<WeightSettingDTO, WeightSetting>()
+            .ForMember(dest => dest.StandaredWeight, opt => opt.MapFrom(src => src.standaredWeight))
+            .ForMember(dest => dest.Addition_Cost, opt => opt.MapFrom(src => src.addition_Cost))
+            ;
+
+            #endregion
+
+            #region from UserRole to UserRoleDTO
+            CreateMap<UserRole, UserRoleDTO>()
+            .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.roleName, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.Date))
+            ;
+            // Mapping from UserRoleDTO to UserRole (reverse direction)
+            CreateMap<UserRoleDTO, UserRole>()
+           .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.roleName))
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.date))
+            ;
 
             #endregion
 

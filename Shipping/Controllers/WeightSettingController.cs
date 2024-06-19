@@ -11,6 +11,11 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using AutoMapper;
+using Shipping.UnitOfWork;
+using Shipping.DTO;
+using Swashbuckle.AspNetCore.Annotations;
+using Shipping.Constants;
 
 namespace Shipping.Controllers
 {
@@ -18,101 +23,58 @@ namespace Shipping.Controllers
     [ApiController]
     public class WeightSettingController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
 
-        public WeightSettingController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        private readonly IUnitOfWork<WeightSetting> _WeightSettingUnit;
+        private readonly IMapper _Mapper;
+
+        public WeightSettingController(IUnitOfWork<WeightSetting> Unit, IMapper Mapper)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _Mapper = Mapper;
+            _WeightSettingUnit = Unit;
         }
 
-
-
-
-        #region Login
-        [HttpPost("login")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginDTO login)
+        #region Get Weight Setting
+        [HttpGet]
+        [Authorize(Permissions.WeightSettings.View)]
+        [Produces("application/json")]
+        [SwaggerOperation(Summary = "GetWeightSetting")]
+        [SwaggerResponse(StatusCodes.Status200OK,"when get Weight Settings Successfully")]
+        [SwaggerResponse(StatusCodes.Status404NotFound,"when can't find Weight Settings")]
+        public async Task<IActionResult> GetWeightSetting()
         {
-            if (ModelState.IsValid)
-            {
-                var user = await _userManager.FindByEmailAsync(login.Email);
-                if (user == null)
-                {
-                    return BadRequest(new { message = "البريد الالكتروني او اسم المستخدم غير صحيح" });
-                }
-
-                var result = await _signInManager.PasswordSignInAsync(user, login.Password, login.RememberMe, false);
-                var userClaims = await _userManager.GetClaimsAsync(user);
-                userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-
-                string key = "Iti Pd And Bi 44 Menoufia Shipping System For GP";
-                var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
-                var credential = new SigningCredentials(secertkey, SecurityAlgorithms.HmacSha256);
-
-                var token = new JwtSecurityToken(
-                    claims: userClaims,
-                    expires: DateTime.Now.AddDays(2),
-                    signingCredentials: credential
-                );
-
-                var tokenstring = new JwtSecurityTokenHandler().WriteToken(token);
-                var roles = await _userManager.GetRolesAsync(user);
-                if (result.Succeeded)
-                {
-                    return Ok(new { message = "تم تسجيل الدخول", Token = tokenstring, Role = roles.FirstOrDefault() ,User=user});
-                }
-                else
-                {
-                    return BadRequest(new { message = "كلمة المرور غير صحيحة" });
-                }
-            }
-            return BadRequest(new { message = "البريد الالكتروني او كلمة المرور غير صحيحين" });
+            WeightSetting ws = await _WeightSettingUnit.Repository.GetByIdAsync(1);
+            if (ws == null) return NotFound();
+             WeightSettingDTO wsDTO =_Mapper.Map<WeightSettingDTO>(ws);
+            return Ok(wsDTO);
         }
         #endregion
 
-        #region Logout
-        [HttpPost("logout")]
-        [Authorize]
-        public async Task<IActionResult> Logout()
+
+        #region Edit Weight Setting
+        [HttpPut]
+        [Authorize(Permissions.WeightSettings.Edit)]
+        [Authorize(Permissions.WeightSettings.View)]
+        [Produces("application/json")]
+        [Consumes("application/json")]
+        [SwaggerOperation(Summary = "GetWeightSetting")]
+        [SwaggerResponse(StatusCodes.Status204NoContent, "when  Weight Settings had been updated Successfully")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "when can't update Weight Settings")]
+        public async Task<IActionResult> PutWeightSetting(WeightSettingDTO wsDTO)
         {
-            await _signInManager.SignOutAsync();
-            return Ok(new { message = "تم تسجيل الخروج" });
+            WeightSetting ws = _Mapper.Map<WeightSetting>(wsDTO);
+            try
+            {
+                await _WeightSettingUnit.Repository.UpdateAsync(ws);
+                //ليه مش شغالة
+            }
+            catch(Exception ex) 
+            {
+                return BadRequest(new { message=ex.Message});
+            }
+           
+            return NoContent();
         }
         #endregion
 
-        #region Change Password
-        [HttpPost("changePassword")]
-        [Authorize]
-        public async Task<IActionResult> ChangePassword(PasswordDTO password)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return Unauthorized(new { message = "هذا المستخدم غير موجود" });
-            }
-            bool OldPassCheck = await _userManager.CheckPasswordAsync(user, password.OldPassword);
-            if (!OldPassCheck)
-            {
-                return BadRequest(new { message = "كلمة المرور القديمة غير متطابقة" });
-            }
-            if (OldPassCheck && password.NewPassword == password.ConfirmNewPassword)
-            {
-                var result = await _userManager.ChangePasswordAsync(user, password.OldPassword, password.NewPassword);
-                if (!result.Succeeded)
-                {
-                    return BadRequest(new { message = "خطأ في تغير كلمة المرور", errors = result.Errors });
-                }
-
-                await _signInManager.SignOutAsync();
-                return Ok(new { message = "تم تغير كلمة المرور بنجاح" });
-            }
-            else
-            {
-                return BadRequest(new { message = "كلمة المرور غير متطابقة" });
-            }
-        }
-        #endregion
     }
 }

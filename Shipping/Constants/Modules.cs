@@ -17,6 +17,7 @@
     {
         public static readonly Dictionary<string, string> ModulesInEn_AR = new Dictionary<string, string>
         {
+           // {"key","Value" },
             { "Controls", "المجموعات" },
             { "Merchants", "التجار" },
             { "Deliveries", "المناديب" },

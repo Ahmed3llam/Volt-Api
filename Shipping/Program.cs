@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Shipping.Models;
 using Shipping.UnitOfWork;
+using Shipping.Repository.ArabicNamesForRoleClaims;
 internal class Program
 {
     private static void Main(string[] args)
@@ -103,7 +104,9 @@ internal class Program
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
-        
+        builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
+        builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims > ();
+
         #endregion
 
         builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
