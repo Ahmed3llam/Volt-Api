@@ -11,6 +11,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Shipping.Controllers
 {
@@ -30,17 +31,20 @@ namespace Shipping.Controllers
         #region Login
         [HttpPost("login")]
         [AllowAnonymous]
+        [SwaggerOperation(Summary = "Authenticates a user and returns a JWT token.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Successfully authenticated and returns a JWT token.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid email or password.")]
         public async Task<IActionResult> Login(LoginDTO login)
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByEmailAsync(login.Email);
+                var user = await _userManager.FindByEmailAsync(login.email);
                 if (user == null)
                 {
                     return BadRequest(new { message = "البريد الالكتروني او اسم المستخدم غير صحيح" });
                 }
 
-                var result = await _signInManager.PasswordSignInAsync(user, login.Password, login.RememberMe, false);
+                var result = await _signInManager.PasswordSignInAsync(user, login.password, login.rememberMe, false);
                 var userClaims = await _userManager.GetClaimsAsync(user);
                 userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
 
@@ -72,6 +76,8 @@ namespace Shipping.Controllers
         #region Logout
         [HttpPost("logout")]
         [Authorize]
+        [SwaggerOperation(Summary = "Logs out the current user.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Successfully logged out.")]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
@@ -82,6 +88,10 @@ namespace Shipping.Controllers
         #region Change Password
         [HttpPost("changePassword")]
         [Authorize]
+        [SwaggerOperation(Summary = "Changes the password for the logged-in user.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Password changed successfully.")]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid password details.")]
+        [SwaggerResponse(StatusCodes.Status401Unauthorized, "User not found.")]
         public async Task<IActionResult> ChangePassword(PasswordDTO password)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -89,14 +99,14 @@ namespace Shipping.Controllers
             {
                 return Unauthorized(new { message = "هذا المستخدم غير موجود" });
             }
-            bool OldPassCheck = await _userManager.CheckPasswordAsync(user, password.OldPassword);
+            bool OldPassCheck = await _userManager.CheckPasswordAsync(user, password.oldPassword);
             if (!OldPassCheck)
             {
                 return BadRequest(new { message = "كلمة المرور القديمة غير متطابقة" });
             }
-            if (OldPassCheck && password.NewPassword == password.ConfirmNewPassword)
+            if (OldPassCheck && password.newPassword == password.confirmNewPassword)
             {
-                var result = await _userManager.ChangePasswordAsync(user, password.OldPassword, password.NewPassword);
+                var result = await _userManager.ChangePasswordAsync(user, password.oldPassword, password.newPassword);
                 if (!result.Succeeded)
                 {
                     return BadRequest(new { message = "خطأ في تغير كلمة المرور", errors = result.Errors });

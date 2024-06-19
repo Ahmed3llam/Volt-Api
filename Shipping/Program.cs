@@ -6,6 +6,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Shipping.Models;
 using Shipping.UnitOfWork;
+using Shipping.Repository.Employee_Repository;
+using Shipping.AutoMapperProfiles;
+using Microsoft.Extensions.DependencyInjection;
 internal class Program
 {
     private static void Main(string[] args)
@@ -100,10 +103,11 @@ internal class Program
 
         #region register UnitOfWork & Configuration & myServices 
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+        builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
-        
+
         #endregion
 
         builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
@@ -123,7 +127,12 @@ internal class Program
                     );
 
         //use autoMapper
-        builder.Services.AddAutoMapper(typeof(Program));
+        var serviceProvider = builder.Services.BuildServiceProvider();
+        var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
+        builder.Services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile(new MappingEmployee());
+        }, typeof(Program));
 
 
         var app = builder.Build();
