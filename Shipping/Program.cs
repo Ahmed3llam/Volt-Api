@@ -135,12 +135,11 @@ internal class Program
 
         #region register UnitOfWork & Configuration & myServices 
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-        builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
-
-
+        builder.Services.AddScoped<IUnitOfWork<Order>, UnitOfWork<Order>>();
+        builder.Services.AddScoped<IUnitOfWork<City>, UnitOfWork<City>>();
+        builder.Services.AddScoped<IUnitOfWork<Government>, UnitOfWork<Government>>();
         builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();
-
-
+        builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();

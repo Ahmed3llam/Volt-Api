@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shipping.Models;
 
@@ -11,9 +12,11 @@ using Shipping.Models;
 namespace Shipping.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    partial class ShippingContextModelSnapshot : ModelSnapshot
+    [Migration("20240619172500_V2")]
+    partial class V2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -577,14 +580,14 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = "5ab58670-8727-4b67-85d5-4199912a70bf",
-                            Date = "18/06/2024 01:21:37 م",
+                            Date = "6/19/2024 8:24:57 PM",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3773b28b-dc4e-4083-99a3-8566e1c47110",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "d8d70001-b16f-4c42-8f4f-ecb094ba7b7e",
+                            Date = "6/19/2024 8:24:57 PM",
                             Name = "المناديب",
                             NormalizedName = "المناديب"
                         },
@@ -677,7 +680,7 @@ namespace Shipping.Migrations
                     b.Property<int>("Addition_Cost")
                         .HasColumnType("int");
 
-                    b.Property<int>("StandaredWeight")
+                    b.Property<int>("Cost")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -688,8 +691,8 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = 1,
-                            Addition_Cost = 30,
-                            StandaredWeight = 10
+                            Addition_Cost = 100,
+                            Cost = 10
                         });
                 });
 
