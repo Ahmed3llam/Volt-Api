@@ -57,8 +57,14 @@ namespace Shipping.AutoMapperProfiles
                 .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.StateId))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.Government.Name)) // تعيين اسم المحافظة
-                .ReverseMap();
+                ;
+            CreateMap<BranchDTO, Branch>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.StateId))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
             #endregion
+
         }
 
     }

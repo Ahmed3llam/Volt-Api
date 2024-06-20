@@ -23,7 +23,8 @@ namespace Shipping.Controllers
             _mapper = mapper;
         }
 
-      
+
+        #region GetAllBranches
         [HttpGet]
         public async Task<ActionResult<List<BranchDTO>>> GetAllBranches()
         {
@@ -31,8 +32,9 @@ namespace Shipping.Controllers
             var branchDTOs = _mapper.Map<List<BranchDTO>>(branches);
             return Ok(branchDTOs);
         }
+        #endregion
 
-   
+        #region GetBranchById 
         [HttpGet("{id}")]
 
         public async Task<ActionResult<BranchDTO>> GetBranchById(int id)
@@ -47,8 +49,10 @@ namespace Shipping.Controllers
             var branchDTO = _mapper.Map<BranchDTO>(branch);
             return Ok(branchDTO);
         }
+        #endregion
 
 
+        #region Add New Branch
         [HttpPost]
         public async Task<ActionResult<BranchDTO>> AddBranch(BranchDTO branchDTO)
         {
@@ -66,7 +70,9 @@ namespace Shipping.Controllers
                 return BadRequest($"فشلت العملية: {ex.Message}");
             }
         }
+        #endregion
 
+        #region Update Branch
         [HttpPut("{id}")]
     
         public async Task<IActionResult> UpdateBranch(int id, BranchDTO branchDTO)
@@ -93,8 +99,10 @@ namespace Shipping.Controllers
                 return BadRequest($"فشلت العملية: {ex.Message}");
             }
         }
+        #endregion
 
-      
+        #region DeleteBranch
+
         [HttpDelete("{id}")]
 
         public async Task<IActionResult> DeleteBranch(int id)
@@ -115,5 +123,6 @@ namespace Shipping.Controllers
                 return BadRequest($"فشلت العملية: {ex.Message}");
             }
         }
+        #endregion
     }
 }
