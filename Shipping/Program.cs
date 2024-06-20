@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Http.Features;
 using Shipping.Repository.Employee_Repository;
 using Shipping.AutoMapperProfiles;
 using Microsoft.Extensions.DependencyInjection;
+using Shipping.Repository.DeliveryRepo;
+using Microsoft.AspNetCore.Hosting;
 internal class Program
 {
     private static void Main(string[] args)
@@ -133,6 +135,11 @@ internal class Program
         builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
 
 
+        builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();
+
+
+
+
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
         builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
         builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims > ();
@@ -141,7 +148,10 @@ internal class Program
 
 
         //use autoMapper
-        builder.Services.AddAutoMapper(typeof(Program));
+
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
 
 
         var app = builder.Build();

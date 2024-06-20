@@ -72,7 +72,6 @@ namespace Shipping.Repository
             throw new InvalidOperationException("Entity does not contain properties named 'Id'.");
         }
 
-
         public async Task AddAsync(TEntity entity)
         {
             db.Set<TEntity>().Add(entity);

@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Shipping.Models;
 using Shipping.Repository;
 using Shipping.Repository.Employee_Repository;
+using Shipping.Repository.DeliveryRepo;
 
 namespace Shipping.UnitOfWork
 {
@@ -11,12 +12,14 @@ namespace Shipping.UnitOfWork
     {
         ShippingContext db;
         IRepository<T> repo;
-        IEmployeeRepository employeeRepository;
+        IDeliveryRepository deliveryRepository;
+        private readonly UserManager<AppUser> userManager;
+         IEmployeeRepository employeeRepository;
 
-
-        public UnitOfWork(ShippingContext db)
+        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
         {
             this.db = db;
+            this.userManager = userManager;
         }
 
         public IRepository<T> Repository
@@ -28,7 +31,15 @@ namespace Shipping.UnitOfWork
             }
         }
 
-        public IEmployeeRepository EmployeeRepository
+        public IDeliveryRepository DeliveryRepository
+        {
+            get
+            {
+                if (deliveryRepository == null) { deliveryRepository = new DeliveryRepository(db , userManager); }
+                return deliveryRepository;
+            }
+        }
+          public IEmployeeRepository EmployeeRepository
         {
             get
             {
