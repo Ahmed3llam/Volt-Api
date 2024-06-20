@@ -15,16 +15,24 @@ namespace Shipping.Repository.Employee_Repository
             this.context = context;
         }
 
+        #region Get All Employees
+        public async Task<List<Employee>> GetAllEmployees()
+        {
+            var employees = context.Employees.Where(e => e.User.IsDeleted != true).ToList();
+            return employees;
+        }
+        #endregion
+
         #region Add Employee (empDto)
-        public async Task Add(EmpDTO newEmp,UserManager<AppUser> _userManager)
+        public async Task<Employee> Add(EmpDTO newEmp,UserManager<AppUser> _userManager)
         {
             var branch = context.Branches.FirstOrDefault(b => b.Id == newEmp.branchId);
-            if (branch == null) return;
+            if (branch == null) throw new Exception("الفرع غير موجود");
 
             var user = new AppUser
             {
                 Email = newEmp.email,
-                UserName = newEmp.name,
+                UserName = newEmp.name.Replace(" ", "") + new Random().Next(1, 999),
                 Name = newEmp.name,
                 PhoneNumber = newEmp.phone
             };
@@ -42,7 +50,14 @@ namespace Shipping.Repository.Employee_Repository
                         BranchId = branch.Id
                     };
                     context.Employees.Add(employee);
+                    return employee;
                 }
+                throw new Exception("فشلت العملية");
+            }
+            else
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"فشلت العملية: {errors}");
             }
         }
         #endregion
@@ -50,8 +65,7 @@ namespace Shipping.Repository.Employee_Repository
         #region Get Employee by ID
         public async Task<Employee> GetEmployeeByIdAsync(string id)
         {
-            var employee = context.Employees.FirstOrDefault(e => e.User.Id == id);
-            //var employeeDto = _mapper.Map<EmpDTO>(employee);
+            var employee = context.Employees.FirstOrDefault(e => e.User.Id == id && e.User.IsDeleted != true);
             return employee;
         }
         #endregion
@@ -59,24 +73,18 @@ namespace Shipping.Repository.Employee_Repository
         #region Search Employees
         public List<Employee> Search(string query)
         {
-            var employees = context.Employees
-                .Where(e => e.User.Name.Contains(query) ||
-                            e.User.Email.Contains(query) ||
-                            e.User.PhoneNumber.Contains(query) ||
-                            e.Branch.Name.Contains(query)).ToList();
-
-            //var employee = _mapper.Map<List<EmpDTO>>(employees);
+            var employees = context.Employees.Where(e => e.User.Name.Contains(query) || e.User.Email.Contains(query) 
+                    || e.User.PhoneNumber.Contains(query) ||e.Branch.Name.Contains(query)).Where(e => e.User.IsDeleted != true).ToList();
             return employees;
         }
         #endregion
 
         #region Update Employee (empDto)
-        public async Task Update(EmpDTO NewData, UserManager<AppUser> _userManager)
+        public async Task<Employee> Update(EmpDTO NewData, UserManager<AppUser> _userManager)
         {
             var employee = context.Employees.FirstOrDefault(e => e.User.Id == NewData.id);
-            if (employee == null) return;
+            if (employee == null) throw new Exception("الموظف غير موجود");
 
-            //_mapper.Map(newData, employee);
             employee.User.Name = NewData.name;
 
             //employee.User.Email = NewData.email;
@@ -86,8 +94,7 @@ namespace Shipping.Repository.Employee_Repository
                 var emailUpdateResult = await _userManager.SetEmailAsync(employee.User, NewData.email);
                 if (!emailUpdateResult.Succeeded)
                 {
-                    // Handle the error accordingly
-                    return;
+                    throw new Exception("فشلت العملية"); ;
                 }
             }
 
@@ -105,15 +112,28 @@ namespace Shipping.Repository.Employee_Repository
             {
                 employee.BranchId = branch.Id;
             }
+            return employee;
         }
         #endregion
 
         #region Update Employee Status (emp,status)
-        public void UpdateStatus(Employee employee, bool status)
+        public async Task<Employee> UpdateStatus(Employee employee, bool status)
         {
             if (employee != null)
             {
                 employee.User.Status = status;
+                return employee;
+            }
+            throw new Exception("الموظف غير موجود");
+        }
+        #endregion
+
+        #region Soft Delete For Employee (id)
+        public async Task SoftDeleteAsync(Employee employee)
+        {
+            if (employee != null)
+            {
+                employee.User.IsDeleted = true;
             }
         }
         #endregion

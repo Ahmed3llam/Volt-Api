@@ -13,7 +13,7 @@ namespace Shipping.DTO.Employee_DTOs
         [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
         [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
         public string phone { get; set; }
-        public bool status { get; set; } = true;
+        public bool? status { get; set; } = true;
         public string? branchName { get; set; }
         public int? branchId { get; set; }
         [Required(ErrorMessage = "يجب ادخال الصلاحية")]

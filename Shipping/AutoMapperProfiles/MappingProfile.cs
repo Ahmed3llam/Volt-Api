@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shipping.DTO.Employee_DTOs;
 using Shipping.Models;
 
 namespace Shipping.AutoMapperProfiles
@@ -32,7 +33,17 @@ namespace Shipping.AutoMapperProfiles
 
             #endregion
 
-
+            #region map Employee - EmpDTO
+            CreateMap<Employee, EmpDTO>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForMember(dest => dest.branchId, opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.password, opt => opt.Ignore())
+                .ReverseMap();
+            #endregion
 
         }
     }

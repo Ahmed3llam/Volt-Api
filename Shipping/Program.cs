@@ -127,12 +127,7 @@ internal class Program
                     );
 
         //use autoMapper
-        var serviceProvider = builder.Services.BuildServiceProvider();
-        var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
-        builder.Services.AddAutoMapper(cfg =>
-        {
-            cfg.AddProfile(new MappingEmployee());
-        }, typeof(Program));
+        builder.Services.AddAutoMapper(typeof(Program));
 
 
         var app = builder.Build();

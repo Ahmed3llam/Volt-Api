@@ -33,7 +33,7 @@ namespace Shipping.Controllers
         {
             try
             {
-                var employees = await _unit.Repository.GetAllAsync();
+                var employees = await _unit.EmployeeRepository.GetAllEmployees();
                 if (!employees.Any())
                     return NotFound("لا يوجد موظفين");
 
@@ -55,7 +55,7 @@ namespace Shipping.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving employees: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"حطأ في استرجاع بيانات الموظفين : {ex.Message}");
             }
         }
 
@@ -83,7 +83,7 @@ namespace Shipping.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error retrieving employee: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في استرجاع بيانات الموظف : {ex.Message}");
             }
         }
         #endregion
@@ -115,7 +115,7 @@ namespace Shipping.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error searching employees: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في البحث عن الموظفين: {ex.Message}");
             }
         }
         #endregion
@@ -134,22 +134,18 @@ namespace Shipping.Controllers
                 if (id != employeeDto.id)
                     return BadRequest("الرقم الخاص بالموظف غير متطابق");
 
-                var existingEmployee = await _unit.EmployeeRepository.GetEmployeeByIdAsync(id);
-                if (existingEmployee == null)
-                    return NotFound($"لا يوجد موظف يحمل هذا الرقم");
+                var updated = await _unit.EmployeeRepository.Update(employeeDto, _userManager);
+                _unit.SaveChanges();
 
-                var employee = _mapper.Map<EmpDTO>(existingEmployee);
-                var roles = await _userManager.GetRolesAsync(existingEmployee.User);
-                employee.role = roles.FirstOrDefault();
+                var UpdateData = _mapper.Map<EmpDTO>(updated);
+                var rolesAfterUpdated = await _userManager.GetRolesAsync(updated.User);
+                UpdateData.role = rolesAfterUpdated.FirstOrDefault();
 
-                await _unit.EmployeeRepository.Update(employeeDto,_userManager);
-                await _unit.Repository.SaveAsync();
-
-                return Ok(new { Status = 201, Msg = "تم تعديل البيانات بنجاح" });
+                return Ok(new {Employee = UpdateData, Msg = "تم تعديل البيانات بنجاح" });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error updating employee: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في تعديل بيانات الموظف: {ex.Message}");
             }
         }
         #endregion
@@ -163,25 +159,29 @@ namespace Shipping.Controllers
         {
             try
             {
-                await _unit.EmployeeRepository.Add(employee,_userManager);
+                Employee NewEmployee = await _unit.EmployeeRepository.Add(employee,_userManager);
                 await _unit.Repository.SaveAsync();
-                return Created("", new { Status = 200, employee, Msg = "تم اضافة الموظف بنجاح" });
-                //return CreatedAtAction(nameof(GetEmployee), new { id = employee.id }, employee);
+
+                var employeeDto = _mapper.Map<EmpDTO>(NewEmployee);
+                var roles = await _userManager.GetRolesAsync(NewEmployee.User);
+                employeeDto.role = roles.FirstOrDefault();
+
+                return CreatedAtAction(nameof(GetEmployee), new { id = employeeDto.id },employeeDto);
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error creating employee: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في اضافة موظف جديد : {ex.Message}");
             }
         }
         #endregion
 
         #region Update Status
-        [HttpDelete("{id}")]
+        [HttpPut("status/{id}")]
         [SwaggerOperation(Summary = "Updates the status of an existing employee.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Employee status updated successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Employee not found.")]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
-        public async Task<IActionResult> DeleteEmployee(string id, bool status)
+        public async Task<IActionResult> UpdateEmployeeStatus(string id, bool status)
         {
             try
             {
@@ -189,14 +189,44 @@ namespace Shipping.Controllers
                 if (employee == null)
                     return NotFound($"لا يوجد موظف يحمل هذا الرقم");
 
-                _unit.EmployeeRepository.UpdateStatus(employee, status);
+                var updated = await _unit.EmployeeRepository.UpdateStatus(employee, status);
                 _unit.SaveChanges();
 
-                return Ok(new { Status = 201, Msg = "تم تعديل الحالة بنجاح" });
+                var employeeDto = _mapper.Map<EmpDTO>(updated);
+                var roles = await _userManager.GetRolesAsync(updated.User);
+                employeeDto.role = roles.FirstOrDefault();
+
+                return Ok(new {Employee = employeeDto, Msg = "تم تعديل الحالة بنجاح" });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"Error deleting employee: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في تعديل حالة الموظف : {ex.Message}");
+            }
+        }
+        #endregion
+
+        #region SoftDelete
+        [HttpDelete("{id}")]
+        [SwaggerOperation(Summary = "Soft delete for an existing employee.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Employee deleted successfully.")]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Employee not found.")]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
+        public async Task<IActionResult> DeleteEmployee(string id)
+        {
+            try
+            {
+                var employee = await _unit.EmployeeRepository.GetEmployeeByIdAsync(id);
+                if (employee == null)
+                    return NotFound($"لا يوجد موظف يحمل هذا الرقم");
+
+                _unit.EmployeeRepository.SoftDeleteAsync(employee);
+                _unit.SaveChanges();
+
+                return Ok(new { Status = 201, Msg = "تم حذف الموظف بنجاح" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"خطأ في حذف الموظف : {ex.Message}");
             }
         }
         #endregion
