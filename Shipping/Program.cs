@@ -6,6 +6,9 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Shipping.Models;
 using Shipping.UnitOfWork;
+using Shipping.AutoMapperProfiles;
+using Shipping.Repository.DeliveryRepo;
+using Microsoft.AspNetCore.Hosting;
 internal class Program
 {
     private static void Main(string[] args)
@@ -102,8 +105,11 @@ internal class Program
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 
+        builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();
+
+
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
-        
+
         #endregion
 
         builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
@@ -123,7 +129,10 @@ internal class Program
                     );
 
         //use autoMapper
-        builder.Services.AddAutoMapper(typeof(Program));
+
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
 
 
         var app = builder.Build();

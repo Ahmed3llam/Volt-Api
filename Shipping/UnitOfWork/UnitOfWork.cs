@@ -1,5 +1,7 @@
-﻿using Shipping.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using Shipping.Models;
 using Shipping.Repository;
+using Shipping.Repository.DeliveryRepo;
 
 namespace Shipping.UnitOfWork
 {
@@ -8,11 +10,13 @@ namespace Shipping.UnitOfWork
     {
         ShippingContext db;
         IRepository<T> repo;
+        IDeliveryRepository deliveryRepository;
+        private readonly UserManager<AppUser> userManager;
 
-
-        public UnitOfWork(ShippingContext db)
+        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
         {
             this.db = db;
+            this.userManager = userManager;
         }
 
         public IRepository<T> Repository
@@ -21,6 +25,15 @@ namespace Shipping.UnitOfWork
             {
                 if (repo == null) { repo = new Repository<T>(db); }
                 return repo;
+            }
+        }
+
+        public IDeliveryRepository DeliveryRepository
+        {
+            get
+            {
+                if (deliveryRepository == null) { deliveryRepository = new DeliveryRepository(db , userManager); }
+                return deliveryRepository;
             }
         }
 

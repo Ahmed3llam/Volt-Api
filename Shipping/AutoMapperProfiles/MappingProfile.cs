@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Shipping.DTO.DeliveryDTOs;
 using Shipping.Models;
 
 namespace Shipping.AutoMapperProfiles
@@ -33,7 +34,26 @@ namespace Shipping.AutoMapperProfiles
             #endregion
 
 
+            #region From Delivery To DeliveryDTO
+
+            CreateMap<Delivery, DeliveryDTO>()
+                .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
+                .ForMember(dest => dest.Government, opt => opt.MapFrom(src => src.Governement))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType))
+                .ForMember(dest => dest.CompanyPercentage, opt => opt.MapFrom(src => src.CompanyPercent))
+                .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch.Id))
+                .ReverseMap();
 
         }
+
+        #endregion
+
     }
-}
+ }
+
