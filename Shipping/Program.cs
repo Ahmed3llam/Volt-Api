@@ -15,6 +15,9 @@ using Shipping.AutoMapperProfiles;
 using Microsoft.Extensions.DependencyInjection;
 using Shipping.Repository.DeliveryRepo;
 using Microsoft.AspNetCore.Hosting;
+using Shipping.Repository.MerchantRepository;
+using Shipping.AutoMapperProfiles;
+using Shipping.Repository.BranchRepository;
 internal class Program
 {
     private static void Main(string[] args)
@@ -153,6 +156,10 @@ internal class Program
 
 
 
+        builder.Services.AddScoped<IMerchantRepository, MerchantRepository>();
+        builder.Services.AddScoped<IUnitOfWork<Merchant>, UnitOfWork<Merchant>>();
+        builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+        builder.Services.AddScoped<IUnitOfWork<Branch>, UnitOfWork<Branch>>();
 
         var app = builder.Build();
 

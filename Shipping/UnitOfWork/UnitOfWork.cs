@@ -4,17 +4,18 @@ using Shipping.Models;
 using Shipping.Repository;
 using Shipping.Repository.Employee_Repository;
 using Shipping.Repository.DeliveryRepo;
+using Shipping.Repository.MerchantRepository;
 
 namespace Shipping.UnitOfWork
 {
-
     public class UnitOfWork<T> : IUnitOfWork<T> where T : class
     {
         ShippingContext db;
         IRepository<T> repo;
         IDeliveryRepository deliveryRepository;
         private readonly UserManager<AppUser> userManager;
-         IEmployeeRepository employeeRepository;
+        IEmployeeRepository employeeRepository;
+        IMerchantRepository merchantRepository;
 
         public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
         {
@@ -47,11 +48,19 @@ namespace Shipping.UnitOfWork
                 return employeeRepository;
             }
         }
+        public IMerchantRepository MerchantRepository
+        {
+            get
+            {
+                if (merchantRepository == null) { merchantRepository = new MerchantRepository(db); }
+                return merchantRepository;
+            }
+        }
+
 
         public void SaveChanges()
         {
             db.SaveChanges();
         }
     }
-
 }
