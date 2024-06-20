@@ -21,10 +21,7 @@ namespace Shipping.UnitOfWork
         public IOrderRepository OrderRepository { get; }
         public ICityRepository CityRepository { get; }
         public IGovernmentRepository GovernmentRepository { get; }
-        public IDeliveryRepository DeliveryRepository { get; }
-        public IEmployeeRepository EmployeeRepository { get; }
 
-    
         public void SaveChanges();
     }
 
