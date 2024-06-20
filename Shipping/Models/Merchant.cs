@@ -10,7 +10,6 @@ namespace Shipping.Models
 
         [ForeignKey("Branch")]
         public int BranchId { get; set; }
-
         public string Address { get; set; }
         public string Government { get; set; }
         public string City { get; set; }

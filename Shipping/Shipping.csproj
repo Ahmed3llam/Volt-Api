@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Repository\MerchantRepository\BranchRepository\**" />
+    <Content Remove="Repository\MerchantRepository\BranchRepository\**" />
+    <EmbeddedResource Remove="Repository\MerchantRepository\BranchRepository\**" />
+    <None Remove="Repository\MerchantRepository\BranchRepository\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="CloudinaryDotNet" Version="1.26.2" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />

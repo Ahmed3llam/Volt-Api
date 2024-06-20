@@ -1,14 +1,14 @@
 ﻿using Shipping.Models;
 using Shipping.Repository;
+using Shipping.Repository.MerchantRepository;
 
 namespace Shipping.UnitOfWork
 {
-
     public class UnitOfWork<T> : IUnitOfWork<T> where T : class
     {
         ShippingContext db;
         IRepository<T> repo;
-
+        IMerchantRepository merchantRepository;
 
         public UnitOfWork(ShippingContext db)
         {
@@ -24,10 +24,18 @@ namespace Shipping.UnitOfWork
             }
         }
 
+        public IMerchantRepository MerchantRepository
+        {
+            get
+            {
+                if (merchantRepository == null) { merchantRepository = new MerchantRepository(db); }
+                return merchantRepository;
+            }
+        }
+
         public void SaveChanges()
         {
             db.SaveChanges();
         }
     }
-
 }

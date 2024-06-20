@@ -10,7 +10,7 @@ namespace Shipping.Models
         public int Id { get; set; }
         [ForeignKey("Government")]
         [Required(ErrorMessage = "يجب ادخال المحافظة")]
-        public int StateId { get; set; }
+        public int? StateId { get; set; }
         [Required(ErrorMessage = "يجب ادخال الاسم الفرع")]
         public string Name { get; set; }
         public DateTime Date { get; set; }
