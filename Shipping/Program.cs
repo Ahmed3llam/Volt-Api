@@ -10,6 +10,9 @@ using Shipping.Repository.ArabicNamesForRoleClaims;
 using Microsoft.AspNetCore.Authorization;
 using Shipping.CustomAuth;
 using Microsoft.AspNetCore.Http.Features;
+using Shipping.Repository.Employee_Repository;
+using Shipping.AutoMapperProfiles;
+using Microsoft.Extensions.DependencyInjection;
 internal class Program
 {
     private static void Main(string[] args)
@@ -127,6 +130,7 @@ internal class Program
 
         #region register UnitOfWork & Configuration & myServices 
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+        builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();

@@ -57,6 +57,39 @@ namespace Shipping.AutoMapperProfiles
             #endregion
 
 
+            #region from WeightSetting to WeightSettingDTO
+            CreateMap<WeightSetting, WeightSettingDTO>()
+            .ForMember(dest => dest.standaredWeight, opt => opt.MapFrom(src => src.StandaredWeight))
+            .ForMember(dest => dest.addition_Cost, opt => opt.MapFrom(src => src.Addition_Cost))
+            ;
+            // Mapping from WeightSettingDTO to WeightSetting (reverse direction)
+            CreateMap<WeightSettingDTO, WeightSetting>()
+            .ForMember(dest => dest.StandaredWeight, opt => opt.MapFrom(src => src.standaredWeight))
+            .ForMember(dest => dest.Addition_Cost, opt => opt.MapFrom(src => src.addition_Cost))
+            ;
+
+            #endregion
+
+            #region from UserRole to UserRoleDTO
+            CreateMap<UserRole, UserRoleDTO>()
+            .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.roleName, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.Date)).ReverseMap()
+            ;
+       
+            #endregion
+
+            #region map Employee - EmpDTO
+            CreateMap<Employee, EmpDTO>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForMember(dest => dest.branchId, opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.password, opt => opt.Ignore())
+                .ReverseMap();
+            #endregion
 
         }
     }
