@@ -117,5 +117,21 @@ namespace Shipping.Controllers
             }
         }
         #endregion
+
+        #region Search For Merchant
+        [HttpGet("search")]
+        public async Task<ActionResult<List<MerchantDTO>>> SearchMerchants(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("يرجى إدخال نص للبحث.");
+            }
+
+            var merchants = await _merchantRepository.SearchMerchantsAsync(query);
+            var merchantDTOs = _mapper.Map<List<MerchantDTO>>(merchants);
+
+            return Ok(merchantDTOs);
+        }
+        #endregion
     }
 }

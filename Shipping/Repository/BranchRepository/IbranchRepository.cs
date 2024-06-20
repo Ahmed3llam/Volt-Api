@@ -10,5 +10,7 @@ namespace Shipping.Repository.BranchRepository
         Task UpdateAsync(Branch branch);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+        Task<List<Branch>> SearchAsync(string query);
+
     }
 }

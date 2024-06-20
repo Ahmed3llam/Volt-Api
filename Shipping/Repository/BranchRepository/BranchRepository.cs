@@ -49,5 +49,14 @@ namespace Shipping.Repository.BranchRepository
         {
             return await _context.Branches.AnyAsync(e => e.Id == id);
         }
+        #region Search For Branch
+        public async Task<List<Branch>> SearchAsync(string query)
+        {
+            return await _context.Branches
+                .Include(b => b.Government)
+                .Where(b => b.Name.Contains(query) || b.Government.Name.Contains(query))
+                .ToListAsync();
+        }
+        #endregion
     }
 }

@@ -124,5 +124,21 @@ namespace Shipping.Controllers
             }
         }
         #endregion
+
+        #region Search For Branch
+        [HttpGet("search")]
+        public async Task<ActionResult<List<BranchDTO>>> SearchBranches(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("يرجى إدخال نص للبحث.");
+            }
+
+            var branches = await _branchRepository.SearchAsync(query);
+            var branchDTOs = _mapper.Map<List<BranchDTO>>(branches);
+
+            return Ok(branchDTOs);
+        }
+        #endregion
     }
 }

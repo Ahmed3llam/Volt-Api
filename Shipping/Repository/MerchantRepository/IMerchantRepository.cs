@@ -13,6 +13,7 @@ namespace Shipping.Repository.MerchantRepository
             Task<Merchant> UpdateMerchantAsync(Merchant merchant);
             Task DeleteMerchantAsync(int id);
             Task<List<Merchant>> SearchMerchantsAsync(string query); // Add this line
+
        
     }
 }
