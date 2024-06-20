@@ -1,8 +1,19 @@
 ﻿using AutoMapper;
+using Shipping.DTO;
+using Shipping.DTO.BranchDTOs;
+using Shipping.DTO.DeliveryDTOs;
+using Shipping.DTO.Employee_DTOs;
+using Shipping.DTO.MerchantDTOs;
+using Shipping.Models;
+using AutoMapper;
+using CloudinaryDotNet.Core;
+using Shipping.DTO.BranchDTOs;
+using Shipping.DTO.MerchantDTOs;
+using Shipping.DTO.MerchantDTOs;
+using Shipping.Models;
 using Shipping.DTO.CityDTO;
 using Shipping.DTO.GovernmentDTO;
 using Shipping.DTO.OrderDTO;
-using Shipping.Models;
 
 namespace Shipping.AutoMapperProfiles
 {
@@ -55,7 +66,13 @@ namespace Shipping.AutoMapperProfiles
                .ForMember(dest => dest.GovernmentId, opt => opt.MapFrom(src => src.governmentId))
      
 
-               ;
+            #region from UserRole to UserRoleDTO
+            CreateMap<UserRole, UserRoleDTO>()
+            .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.roleName, opt => opt.MapFrom(src => src.Name))
+            .ForMember(dest => dest.date, opt => opt.MapFrom(src => src.Date)).ReverseMap()
+            ;
+
             #endregion
 
 
@@ -97,9 +114,60 @@ namespace Shipping.AutoMapperProfiles
          .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.OrderStatus))
          .ReverseMap()
             ;
+
+            #endregion
+
+            #region map Employee - EmpDTO
+            CreateMap<Employee, EmpDTO>()
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForMember(dest => dest.branchId, opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.password, opt => opt.Ignore())
+                .ReverseMap();
+            #endregion
+            #region From Delivery To DeliveryDTO
+
+
+
+
+            #endregion
+            #region Map Merchant - MerchantDTO
+            CreateMap<Merchant, MerchantDTO>()
+                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
+                     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+                     .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.User.PasswordHash))
+                     .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                     .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
+                     .ForMember(dest => dest.PickUpSpecialCost, opt => opt.MapFrom(src => src.PickUpSpecialCost))
+                     .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent))
+                     .ReverseMap();
+            #endregion
+            #region Branch Mapper
+            CreateMap<Branch, BranchDTO>()
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                    .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.StateId))
+                    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status))
+                    .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.Government.Name)) // تعيين اسم المحافظة
+                    ;
+            CreateMap<BranchDTO, Branch>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.StateId))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
             #endregion
 
 
         }
     }
+
+
 }
+
+
+
+
