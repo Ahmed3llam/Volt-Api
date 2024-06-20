@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.DTO.CityDTO;
 using Shipping.Models;
 using Shipping.Repository.CityRepo;
 using Shipping.Repository.GovernmentRepo;
@@ -10,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace Shipping.Controllers
 {
     [ApiController]
@@ -17,10 +20,11 @@ namespace Shipping.Controllers
     public class CityController : ControllerBase
     {
         private readonly IUnitOfWork<City> _unit;
-
-        public CityController(IUnitOfWork<City> unit)
+        private readonly IMapper _mapper;
+        public CityController(IUnitOfWork<City> unit ,IMapper mapper)
         {
             _unit = unit;
+            _mapper = mapper;
         }
 
         #region GetCitiesByGovernment
@@ -31,7 +35,8 @@ namespace Shipping.Controllers
         public ActionResult<IEnumerable<City>> GetCitiesByGovernment(int governmentId)
         {
             var cities = _unit.CityRepository.GetAllByGovernmentId(governmentId);
-            return Ok(cities);
+            var cityList = _mapper.Map<List<CityDTO>>(cities);
+            return Ok(cityList);
         }
         #endregion
 
@@ -42,12 +47,15 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Adds a new city.")]
         [SwaggerResponse(StatusCodes.Status201Created, "City successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
-        public async Task<ActionResult> AddCity([FromBody] City city)
+        public async Task<ActionResult> AddCity([FromBody] CityDTO cityDTO)
         {
             if (ModelState.IsValid)
             {
+                var city = _mapper.Map<City>(cityDTO);
                 _unit.CityRepository.AddToGovernment(city.GovernmentId, city);
-                return CreatedAtAction(nameof(GetCityById), new { id = city.Id }, city);
+
+                var newcity = _mapper.Map<CityDTO>(city);
+                return CreatedAtAction(nameof(GetCityById), new { id = newcity.id }, newcity);
             }
 
             return BadRequest(ModelState);
@@ -65,11 +73,11 @@ namespace Shipping.Controllers
             var city = _unit.CityRepository.GetById(id);
             if (city == null)
             {
-                return NotFound();
+                return NotFound("المدينه غير موجوده");
             }
             city.Status = status;
             _unit.CityRepository.Update(id, city);
-            return NoContent();
+            return Ok(new { Msg = "تم تعديل الحاله بنجاح" });
         }
         #endregion
 
@@ -79,14 +87,17 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Edits an existing city.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City successfully updated.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The ID in the URL does not match the ID in the body.")]
-        public ActionResult EditCity(int id, [FromBody] City city)
+        public ActionResult EditCity(int id, [FromBody] CityDTO cityDTO)
         {
-            if (id != city.Id)
+            if (id != cityDTO.id)
             {
-                return BadRequest();
+
+                return BadRequest("برجاء ادخال بيانات صحيحه الرقم التعريفي غير متتطابق");
             }
+
+            var city = _mapper.Map<City>(cityDTO);
             _unit.CityRepository.Update(id, city);
-            return NoContent();
+            return Ok(new { Msg = "تم تعديل المدينه بنجاح" });
         }
         #endregion
 
@@ -107,7 +118,8 @@ namespace Shipping.Controllers
                 cities = _unit.CityRepository.GetAllByGovernmentId(governmentId)
                     .Where(i => i.Name.ToUpper().Contains(query.ToUpper())).ToList();
             }
-            return Ok(cities);
+            var cityList = _mapper.Map<List<CityDTO>>(cities);
+            return Ok(cityList);
         }
         #endregion
 
@@ -122,11 +134,11 @@ namespace Shipping.Controllers
             var city = _unit.CityRepository.GetById(id);
             if (city == null)
             {
-                return NotFound();
+                return NotFound("المدينه غير موجوده");
             }
             city.IsDeleted = true;
             _unit.CityRepository.Update(id, city);
-            return NoContent();
+            return Ok(new { Msg = "تم الحذف  بنجاح" });
         }
         #endregion
 
@@ -135,14 +147,15 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Gets a city by ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the city object.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "City not found.")]
-        public ActionResult<City> GetCityById(int id)
+        public ActionResult<CityDTO> GetCityById(int id)
         {
             var city = _unit.CityRepository.GetById(id);
             if (city == null)
             {
-                return NotFound();
+                return NotFound("المدينه غير موجوده");
             }
-            return Ok(city);
+            var cityDTO = _mapper.Map<CityDTO>(city);
+            return Ok(cityDTO);
         }
         #endregion
     }

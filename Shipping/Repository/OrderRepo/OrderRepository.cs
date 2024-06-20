@@ -15,44 +15,63 @@ namespace Shipping.Repository.OrderRepo
     public class OrderRepository : IOrderRepository
     {
         private readonly ShippingContext _myContext;
-    
 
         public OrderRepository(ShippingContext myContext)
         {
             _myContext = myContext;
-  
         }
 
         public async Task<List<OrderDTO>> GetAllOrdersAsync()
         {
-            var orders = await _myContext.Orders
-                .Include(o => o.City).ThenInclude(c => c.Government)
-                .Where(o => !o.IsDeleted)
-                .ToListAsync();
+            try
+            {
+                var orders = await _myContext.Orders
+                    .Include(o => o.City).ThenInclude(c => c.Government)
+                    .Where(o => !o.IsDeleted)
+                    .ToListAsync();
 
-            return orders.Select(order => MapToOrderDTO(order)).ToList();
+                return orders.Select(order => MapToOrderDTO(order)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في جلب جميع الطلبات.", ex);
+            }
         }
 
         public async Task<OrderDTO> GetOrderByIdAsync(int id)
         {
-            var order = await _myContext.Orders
-                .Include(o => o.City).ThenInclude(c => c.Government)
-                .FirstOrDefaultAsync(o => o.SerialNumber == id);
+            try
+            {
+                var order = await _myContext.Orders
+                    .Include(o => o.City).ThenInclude(c => c.Government)
+                    .FirstOrDefaultAsync(o => o.SerialNumber == id);
 
-            if (order == null)
-                return null;
+                if (order == null)
+                    throw new Exception("الطلب غير موجود.");
 
-            return MapToOrderDTO(order);
+                return MapToOrderDTO(order);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في جلب الطلب حسب الرقم.", ex);
+            }
         }
 
         public async Task<List<OrderDTO>> GetOrdersByStatusAsync(string orderStatus)
         {
-            var orders = await _myContext.Orders
-                .Include(o => o.City).ThenInclude(c => c.Government)
-                .Where(o => o.OrderStatus == orderStatus && !o.IsDeleted)
-                .ToListAsync();
+            try
+            {
+                var orders = await _myContext.Orders
+                    .Include(o => o.City).ThenInclude(c => c.Government)
+                    .Where(o => o.OrderStatus == orderStatus && !o.IsDeleted)
+                    .ToListAsync();
 
-            return orders.Select(order => MapToOrderDTO(order)).ToList();
+                return orders.Select(order => MapToOrderDTO(order)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في جلب الطلبات حسب الحالة.", ex);
+            }
         }
 
         public async Task<OrderDTO> AddOrderAsync(OrderDTO orderDTO, string userId)
@@ -65,8 +84,10 @@ namespace Shipping.Repository.OrderRepo
                     .Select(m => m.Id)
                     .FirstOrDefaultAsync();
 
-                if (city == null || merchantId == 0)
-                    return null; // Handle error scenario
+                if (city == null)
+                    throw new Exception("المدينة غير موجودة.");
+                if (merchantId == 0)
+                    throw new Exception("التاجر غير موجود.");
 
                 var order = new Order
                 {
@@ -96,7 +117,7 @@ namespace Shipping.Repository.OrderRepo
 
                 var branch = await _myContext.Branches.FirstOrDefaultAsync(b => b.Name == orderDTO.BranchName);
                 if (branch == null)
-                    return null; // Handle error scenario
+                    throw new Exception("الفرع غير موجود.");
 
                 order.BranchId = branch.Id;
 
@@ -109,47 +130,131 @@ namespace Shipping.Repository.OrderRepo
             }
             catch (Exception ex)
             {
-                // Handle exception and log if needed
-                throw ex;
+                throw new Exception("خطأ في إضافة الطلب.", ex);
+            }
+        }
+
+        public async Task<OrderDTO> EditOrderAsync(int id, OrderDTO orderDTO)
+        {
+            try
+            {
+                var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == id);
+                if (order == null)
+                    throw new Exception("الطلب غير موجود.");
+
+                var city = await _myContext.Cities.FirstOrDefaultAsync(c => c.Name == orderDTO.CityName);
+                if (city == null)
+                    throw new Exception("المدينة غير موجودة.");
+
+                order.CityId = city.Id;
+                order.IsVillage = orderDTO.IsVillage;
+                order.ClientEmail = orderDTO.ClientEmail;
+                order.ClientName = orderDTO.ClientName;
+                order.ClientPhoneNumber1 = orderDTO.ClientPhoneNumber1;
+                order.ClientPhoneNumber2 = orderDTO.ClientPhoneNumber2;
+                order.Notes = orderDTO.Notes;
+                order.OrderCost = orderDTO.OrderCost;
+                order.PaymentType = orderDTO.PaymentType;
+                order.ShippingType = orderDTO.ShippingType;
+                order.StreetName = orderDTO.StreetName;
+                order.TotalWeight = orderDTO.TotalWeight;
+                order.Type = orderDTO.Type;
+                order.GovernmentId = city.GovernmentId;
+                order.ShippingCost = orderDTO.ShippingCost;
+
+                var branch = await _myContext.Branches.FirstOrDefaultAsync(b => b.Name == orderDTO.BranchName);
+                if (branch == null)
+                    throw new Exception("الفرع غير موجود.");
+
+                order.BranchId = branch.Id;
+
+                order.orderProducts.Clear();
+                order.orderProducts = orderDTO.OrderProducts.Select(op => new OrderProduct
+                {
+                    ProductName = op.ProductName,
+                    ProductQuantity = op.ProductQuantity,
+                    Weight = op.Weight
+                }).ToList();
+
+                await _myContext.SaveChangesAsync();
+
+                return orderDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في تعديل الطلب.", ex);
             }
         }
 
         public async Task UpdateOrderStatusAsync(int orderId, string status)
         {
-            var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
-            if (order != null)
+            try
             {
+                var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
+                if (order == null)
+                    throw new Exception("الطلب غير موجود.");
+
                 order.OrderStatus = status;
                 await _myContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في تحديث حالة الطلب.", ex);
             }
         }
 
         public async Task UpdateOrderDeliveryAsync(int orderId, int deliveryId)
         {
-            var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
-            if (order != null)
+            try
             {
+                var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
+                if (order == null)
+                    throw new Exception("الطلب غير موجود.");
+
                 order.OrderStatus = "قيد_الانتظار";
                 order.DeliveryId = deliveryId;
                 await _myContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في تحديث تسليم الطلب.", ex);
             }
         }
 
         public async Task DeleteOrderAsync(int orderId)
         {
-            var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
-            if (order != null)
+            try
             {
+                var order = await _myContext.Orders.FirstOrDefaultAsync(o => o.SerialNumber == orderId);
+                if (order == null)
+                    throw new Exception("الطلب غير موجود.");
+
                 order.IsDeleted = true;
                 await _myContext.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في حذف الطلب.", ex);
             }
         }
 
         public async Task<List<string>> GenerateTableAsync(OrdersPlusDeliveriesDTO ordersPlusDeliveriesDTO)
         {
-            // Implement table generation logic using ordersPlusDeliveriesDTO
-            // This is an example placeholder method
-            return new List<string>();
+            try
+            {
+                // Implement table generation logic using ordersPlusDeliveriesDTO
+                var table = new List<string>
+                {
+                    "Header1, Header2, Header3", // Example headers
+                    "Data1, Data2, Data3", // Example data
+                    "Data4, Data5, Data6" // More example data
+                };
+                return await Task.FromResult(table);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("خطأ في إنشاء الجدول.", ex);
+            }
         }
 
         private OrderDTO MapToOrderDTO(Order order)
