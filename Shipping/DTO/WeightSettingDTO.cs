@@ -1,15 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Shipping.Models
+namespace Shipping.DTO
 {
-    public class WeightSetting
+    public class WeightSettingDTO
     {
-        public int Id { get; set; }
+        public int? id { get; set; } = 1;
         [Required(ErrorMessage = "يجب إدخال وزن الشحن الافتراضي")]
-        public int StandaredWeight { get; set; } = 10;
+        public int standaredWeight { get; set; } = 10;
 
 
         [Required(ErrorMessage = "يجب إدخال سعر كل كجم إضافي بالجنية")]
-        public int Addition_Cost { get; set; } = 100;
+        public int addition_Cost { get; set; } = 100;
     }
 }

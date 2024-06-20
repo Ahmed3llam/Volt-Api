@@ -6,6 +6,10 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Shipping.Models;
 using Shipping.UnitOfWork;
+using Shipping.Repository.ArabicNamesForRoleClaims;
+using Microsoft.AspNetCore.Authorization;
+using Shipping.CustomAuth;
+using Microsoft.AspNetCore.Http.Features;
 internal class Program
 {
     private static void Main(string[] args)
@@ -53,6 +57,29 @@ internal class Program
         });
         #endregion
 
+
+        #region Custom Authentication 
+
+
+        builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
+                   .AddJwtBearer("schema",
+                   op =>
+                   {
+                       string key = "Iti Pd And Bi 44 Menoufia Shipping System For GP";
+                       var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
+
+                       op.TokenValidationParameters = new TokenValidationParameters()
+                       {
+                           IssuerSigningKey = secertkey,
+                           ValidateIssuer = false,
+                           ValidateAudience = false
+                       };
+                   }
+                   );
+
+        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        #endregion
 
 
 
@@ -103,24 +130,11 @@ internal class Program
 
 
         //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
-        
+        builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
+        builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims > ();
+
         #endregion
 
-        builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
-                    .AddJwtBearer("schema",
-                    op =>
-                    {
-                        string key = "Iti Pd And Bi 44 Menoufia Shipping System For GP";
-                        var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
-
-                        op.TokenValidationParameters = new TokenValidationParameters()
-                        {
-                            IssuerSigningKey = secertkey,
-                            ValidateIssuer = false,
-                            ValidateAudience = false
-                        };
-                    }
-                    );
 
         //use autoMapper
         builder.Services.AddAutoMapper(typeof(Program));
@@ -141,9 +155,9 @@ internal class Program
 
         app.UseCors(txt);
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
-       
         app.MapControllers();
 
         app.Run();
