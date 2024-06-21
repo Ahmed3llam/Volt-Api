@@ -24,6 +24,7 @@ namespace Shipping.UnitOfWork
         ICityRepository cityRepository;
         IGovernmentRepository governmentRepository;
         IBranchRepository branchRepository;
+        private readonly ILoggerFactory _loggerFactory;
 
 
         public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)

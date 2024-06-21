@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Constants;
 using Shipping.DTO.BranchDTOs;
 using Shipping.Models;
 using Shipping.Repository.BranchRepository;
@@ -140,5 +142,7 @@ namespace Shipping.Controllers
             return Ok(branchDTOs);
         }
         #endregion
+
+      
     }
 }

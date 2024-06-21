@@ -59,10 +59,10 @@ namespace Shipping.Repository.BranchRepository
         }
         #endregion
         #region GetBranchesByGovernmentName
-        public async Task<List<Branch>> GetBranchesByGovernmentNameAsync(string governmentName)
+        public async Task<List<Branch>> GetBranchesByGovernmentNameAsync(int governmentID)
         {
             return await _context.Branches
-                .Where(b => b.Government.Name == governmentName)
+                .Where(b => b.StateId == governmentID)
                 .ToListAsync();
         }
         #endregion

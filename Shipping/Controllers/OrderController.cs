@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.Constants;
+using Shipping.DTO.BranchDTOs;
 using Shipping.DTO.CityDTO;
 using Shipping.DTO.OrderDTO;
 using Shipping.Models;
@@ -253,7 +254,6 @@ namespace Shipping.Controllers
         #endregion
 
         #region Add Orders
-
         [HttpPost("Add")]
         [SwaggerOperation(Summary = "Adds a new order.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Order created successfully.")]
@@ -261,6 +261,11 @@ namespace Shipping.Controllers
         [Authorize(Permissions.Orders.Create)]
         public async Task<IActionResult> Add(OrderDTO orderDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             if (orderDTO.OrderProducts == null || orderDTO.OrderProducts.Count == 0)
             {
                 ModelState.AddModelError("", "يجب عليك اضافه منتاجات");
@@ -279,15 +284,20 @@ namespace Shipping.Controllers
                 var orderDTOResult = _mapper.Map<OrderDTO>(addedOrder);
                 return CreatedAtAction(nameof(Index), new { id = orderDTOResult.Id }, orderDTOResult);
             }
-            catch
+            catch (Exception ex)
             {
+
+           
                 return StatusCode(500, "خطأ في إضافة الطلب.");
             }
         }
-        #endregion
 
-        #region Delete Orders
-        [HttpDelete("Delete")]
+    
+
+    #endregion
+
+    #region Delete Orders
+    [HttpDelete("Delete")]
         [SwaggerOperation(Summary = "Deletes a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order deleted successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
@@ -337,12 +347,13 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Retrieves branches based on government name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of branches.")]
         [Authorize(Permissions.Orders.Create)]
-        public  IActionResult GetBranchesByGovernment(string government)
+        public  IActionResult GetBranchesByGovernment(int government)
         {
             try
             {
                 var branches =  _unit.BranchRepository.GetBranchesByGovernmentNameAsync(government);
-                return Ok(branches);
+                var branchesDTO = _mapper.Map<List<BranchDTO>>(branches);
+                return Ok(branchesDTO);
             }
             catch
             {

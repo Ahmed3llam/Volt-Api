@@ -7,15 +7,13 @@ namespace Shipping.DTO.OrderDTO
     {
         public int? Id { get; set; }
 
-        [Required(ErrorMessage = "يجب ادخال الاسم")]
+       [Required(ErrorMessage = "يجب ادخال الاسم")]
         public string ClientName { get; set; }
 
-       [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
-        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
+        [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
         public int ClientPhoneNumber1 { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
-       [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
         public int? ClientPhoneNumber2 { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال البريد الالكتروني")]
@@ -31,7 +29,6 @@ namespace Shipping.DTO.OrderDTO
         [Required(ErrorMessage = "يجب ادخال هل الشحن لقاريه ام لا ")]
         public bool IsVillage { get; set; }
 
-      //  [Required(ErrorMessage = "يجب ادخال العنوان")]
         public string? StateName { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال المدينه")]
@@ -53,7 +50,7 @@ namespace Shipping.DTO.OrderDTO
         public int ShippingCost { get; set; }
 
         public int? TotalCost { get; set; }
-        public List<OrderProductDTO> OrderProducts { get; set; } 
+        public List<OrderProductDTO> OrderProducts { get; set; }
 
         public int? BranchId { get; set; }
         public string? DeliveryId { get; set; }
@@ -71,8 +68,8 @@ namespace Shipping.DTO.OrderDTO
         [Required(ErrorMessage = "يجب ادخال حاله الطلب")]
         public string OrderStatus { get; set; }
 
-   
-    
+
+
     }
 }
 
