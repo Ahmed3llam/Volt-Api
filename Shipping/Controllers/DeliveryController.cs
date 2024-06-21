@@ -1,10 +1,14 @@
 ﻿// DeliveryController.cs
 
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NSwag.Annotations;
+using Shipping.Constants;
 using Shipping.DTO.DeliveryDTOs;
 using Shipping.Models;
 using Shipping.UnitOfWork;
+using swagger = Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,7 +28,13 @@ namespace Shipping.Controllers
             this.mapper = mapper;
         }
 
+        #region Get All Delivery
+
         [HttpGet]
+        [Authorize(Permissions.Deliveries.View)]
+        [swagger.SwaggerOperation(Summary = "Show all Deliveries.")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Deliveries successfully Retrieved.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
         public async Task<IActionResult> GetAllDeliveries()
         {
             try
@@ -39,9 +49,18 @@ namespace Shipping.Controllers
             }
         }
 
+        #endregion
+
+
+        #region Add New Delivery
 
         // POST: api/Delivery/AddDelivery
         [HttpPost("AddDelivery")]
+        [Authorize(Permissions.Deliveries.Create)]
+        [swagger.SwaggerOperation(Summary = "Add New Delivery.")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Created.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> Add(DeliveryDTO newDeliveryDto)
         {
             if (!ModelState.IsValid)
@@ -63,10 +82,20 @@ namespace Shipping.Controllers
             }
         }
 
+        #endregion
+
+
+        #region Edit Delivery
+
         [HttpPut("EditDelivery/{id}")]
+        [Authorize(Permissions.Deliveries.Edit)]
+        [swagger.SwaggerOperation(Summary = "Edit Existing Delivery.")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Updated.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> EditDelivery(string id, DeliveryDTO updatedDeliveryDto)
         {
-            var existingDelivery = await unitOfWork.DeliveryRepository.GetById(id.ToString());
+            var existingDelivery = await unitOfWork.DeliveryRepository.GetById(id);
             if (existingDelivery == null)
             {
                 return NotFound("Delivery not found.");
@@ -80,8 +109,16 @@ namespace Shipping.Controllers
             return Ok(editedDeliveryDto);
         }
 
+        #endregion
+
+        #region Edit Delivery Status
 
         [HttpPut("ChangeStatus/{id}")]
+        [Authorize(Permissions.Deliveries.Edit)]
+        [swagger.SwaggerOperation(Summary = "Update Delivery Status.")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Status successfully Retrieved.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> ChangeDeliveryStatus(string id, bool status)
         {
             var delivery = await unitOfWork.DeliveryRepository.GetById(id);
@@ -94,7 +131,15 @@ namespace Shipping.Controllers
             return NoContent();
         }
 
+        #endregion
+
+        #region Delete Delivery
+
         [HttpDelete("DeleteDelivery/{id}")]
+        [Authorize(Permissions.Deliveries.Delete)]
+        [swagger.SwaggerOperation(Summary = "Delete Delivery.")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Deleted.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
         public async Task<IActionResult> SoftDeleteDelivery(string id)
         {
             try
@@ -113,5 +158,7 @@ namespace Shipping.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        #endregion
     }
 }
