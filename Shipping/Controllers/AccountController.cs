@@ -112,7 +112,7 @@ namespace Shipping.Controllers
                     return BadRequest(new { message = "خطأ في تغير كلمة المرور", errors = result.Errors });
                 }
 
-                await _signInManager.SignOutAsync();
+                //await _signInManager.SignOutAsync();
                 return Ok(new { message = "تم تغير كلمة المرور بنجاح" });
             }
             else

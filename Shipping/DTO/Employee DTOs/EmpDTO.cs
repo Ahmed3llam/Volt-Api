@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Shipping.DTO.Employee_DTOs
 {
@@ -19,6 +20,7 @@ namespace Shipping.DTO.Employee_DTOs
         [Required(ErrorMessage = "يجب ادخال الصلاحية")]
         public string role { get; set; }
         [StringLength(255, ErrorMessage = "ادخل ع الاقل 8احرف و ارقام", MinimumLength = 8)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? password { get; set; }
     }
 }
