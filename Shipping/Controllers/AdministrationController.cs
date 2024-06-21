@@ -67,9 +67,10 @@ namespace Shipping.Controllers
             };
 
             var result = await _roleManager.CreateAsync(userRole);
+            UserRoleDTO roleToSend = _Mapper.Map<UserRoleDTO>(userRole);
             if (result.Succeeded)
             {
-                return Ok(userRole);
+                return Ok(roleToSend);
             }
             return BadRequest(new {message="لم يتم اضافة المجموعة من فضلك تاكد من البيانات المدخلة"});
         }
