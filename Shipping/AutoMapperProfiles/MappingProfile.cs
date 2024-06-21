@@ -54,6 +54,14 @@ namespace Shipping.AutoMapperProfiles
                ;
             #endregion
 
+            #region from WeightSetting to WeightSettingDTO
+            CreateMap<WeightSetting, WeightSettingDTO>()
+            .ForMember(dest => dest.standaredWeight, opt => opt.MapFrom(src => src.StandaredWeight))
+            .ForMember(dest => dest.addition_Cost, opt => opt.MapFrom(src => src.Addition_Cost)).ReverseMap()
+            ;
+
+            #endregion
+
             #region from UserRole to UserRoleDTO
             CreateMap<UserRole, UserRoleDTO>()
             .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
