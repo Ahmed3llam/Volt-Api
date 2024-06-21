@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -57,40 +58,40 @@ namespace Shipping.Controllers
             }
             catch
             {
-                return StatusCode(500, "خطأ في جلب  الطلبات.");
+                return StatusCode(500, "خطأ في جلب جميع الطلبات.");
             }
         }
         #endregion
 
-        //#region GetOrdersDependonStatus
-        //[HttpGet("GetOrdersDependonStatus")]
-        //[SwaggerOperation(Summary = "Retrieves orders based on status.")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders based on status.")]
-        //[Authorize(Permissions.Orders.View)]
-        //public async Task<ActionResult<IEnumerable<OrderDTO>>> GetOrdersDependonStatus(string? status = null)
-        //{
-        //    try
-        //    {
-        //        var orders = status == null
-        //            ? await _unit.OrderRepository.GetAllOrdersAsync( )
-        //            : await _unit.OrderRepository.GetOrdersByStatusAsync(status);
+        #region GetOrdersDependonStatus
+        [HttpGet("GetOrdersDependonStatus")]
+        [SwaggerOperation(Summary = "Retrieves orders based on status.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders based on status.")]
+        [Authorize(Permissions.Orders.View)]
+        public async Task<ActionResult<List<OrderDTO>>> GetOrdersDependonStatus(string? status = null)
+        {
+            try
+            {
+                var orders = status == null
+                    ? await _unit.OrderRepository.GetAllOrdersAsync()
+                    : await _unit.OrderRepository.GetOrdersByStatusAsync(status);
 
-        //        var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(orders);
-        //        return Ok(orderDTOs);
-        //    }
-        //    catch
-        //    {
-        //        return StatusCode(500, "خطأ في جلب الطلبات حسب الحالة.");
-        //    }
-        //}
-        //#endregion 
+                var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
+                return Ok(orderDTOs);
+            }
+            catch
+            {
+                return StatusCode(500, "خطأ في جلب الطلبات حسب الحالة.");
+            }
+        }
+        #endregion 
 
         #region SearchByClientName
         [HttpGet("SearchByClientName")]
         [SwaggerOperation(Summary = "Searches orders by client name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the client name.")]
         [Authorize(Permissions.Orders.View)]
-        public async Task<ActionResult<IEnumerable<OrderDTO>>> SearchByClientName(string query)
+        public async Task<ActionResult<List<OrderDTO>>> SearchByClientName(string query)
         {
             try
             {
@@ -100,7 +101,7 @@ namespace Shipping.Controllers
                         .Where(i => i.ClientName.ToUpper().Contains(query.ToUpper()))
                         .ToList();
 
-                var orderDTOs = _mapper.Map<IEnumerable<OrderDTO>>(orders);
+                var orderDTOs = _mapper.Map<List<OrderDTO>>(orders);
                 return Ok(orderDTOs);
             }
             catch
@@ -110,40 +111,40 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        //#region SearchByDeliveryName
-        //[HttpGet("SearchByDeliveryName")]
-        //[SwaggerOperation(Summary = "Searches orders by delivery name.")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the delivery name.")]
-        //[Authorize(Permissions.Orders.View)]
-        //public async Task<ActionResult<IEnumerable<OrderDTO>>> SearchByDeliveryName(string query)
-        //{
-        //    try
-        //    {
-        //        var orders = new List<OrderDTO>();
-        //        var deliveries = await _unit.DeliveryRepository.GetAll(null);
+        #region SearchByDeliveryName
+        [HttpGet("SearchByDeliveryName")]
+        [SwaggerOperation(Summary = "Searches orders by delivery name.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the delivery name.")]
+        [Authorize(Permissions.Orders.View)]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> SearchByDeliveryName(string query)
+        {
+            try
+            {
+              List<Order> orders = new List<Order>();   
+                var deliveries = await _unit.DeliveryRepository.GetAll(query);
 
-        //        if (string.IsNullOrWhiteSpace(query))
-        //        {
-        //            orders = await _unit.OrderRepository.GetAllOrdersAsync();
-        //        }
-        //        else
-        //        {
-        //            var filteredDeliveries = deliveries.Where(d => d.User.Name.ToUpper().Contains(query.ToUpper())).ToList();
+                if (string.IsNullOrWhiteSpace(query))
+                {
+                    orders = await _unit.OrderRepository.GetAllOrdersAsync();
+                }
+                else
+                {
+                    var filteredDeliveries = deliveries.Where(d => d.User.Name.ToUpper().Contains(query.ToUpper())).ToList();
 
-        //            foreach (var delivery in filteredDeliveries)
-        //            {
-        //                var filteredOrders = (await _unit.OrderRepository.GetAllOrdersAsync()).Where(o => o.DeliveryId == delivery.User.Id).ToList();
-        //                orders.AddRange(filteredOrders);
-        //            }
-        //        }
-        //        return Ok(orders);
-        //    }
-        //    catch
-        //    {
-        //        return StatusCode(500, "خطأ في البحث عن الطلبات بواسطة اسم المندوب.");
-        //    }
-        //}
-      //  #endregion  
+                    foreach (var delivery in filteredDeliveries)
+                    {
+                        var filteredOrders = (await _unit.OrderRepository.GetAllOrdersAsync()).Where(o => o.DeliveryId == delivery.Id).ToList();
+                        orders.AddRange(filteredOrders);
+                    }
+                }
+                return Ok(orders);
+            }
+            catch
+            {
+                return StatusCode(500, "خطأ في البحث عن الطلبات بواسطة اسم المندوب.");
+            }
+        }
+        #endregion
 
         #region OrderReceipt
         [HttpGet("OrderReceipt")]
@@ -186,8 +187,8 @@ namespace Shipping.Controllers
                     return NotFound("الطلب غير موجود.");
 
                 await _unit.OrderRepository.UpdateOrderDeliveryAsync(id, deliveryId);
-                return NoContent();
-            }
+                return Ok("تم تغير المندوب");
+            }   
             catch
             {
                 return StatusCode(500, "خطأ في تغيير تسليم الطلب.");
@@ -211,7 +212,7 @@ namespace Shipping.Controllers
                     return NotFound("الطلب غير موجود.");
 
                 await _unit.OrderRepository.UpdateOrderStatusAsync(id, status);
-                return NoContent();
+                return Ok("تم تغير حالة الطلب ");
             }
             catch
             {
@@ -239,7 +240,7 @@ namespace Shipping.Controllers
                         return NotFound("الطلب غير موجود.");
 
                     await _unit.OrderRepository.EditOrderAsync(id, orderDto);
-                    return NoContent();
+                    return Ok(" تم التعديل");
                 }
                 catch
                 {
@@ -300,7 +301,7 @@ namespace Shipping.Controllers
                     return NotFound("الطلب غير موجود.");
 
                 await _unit.OrderRepository.DeleteOrderAsync(id);
-                return NoContent();
+                return Ok("تم الحذف ");
             }
             catch (Exception ex)
             {
@@ -321,7 +322,7 @@ namespace Shipping.Controllers
             try
             {
                 var cities = _unit.CityRepository.GetAllByGovernmentId(governmentId);
-                var cityDTOs = _mapper.Map<IEnumerable<CityDTO>>(cities);
+                var cityDTOs = _mapper.Map<List<CityDTO>>(cities);
                 return Ok(cityDTOs);
             }
             catch
@@ -350,84 +351,85 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        //#region Get Order Count
-        //[HttpGet("OrderCount")]
-        //[SwaggerOperation(Summary = "Retrieves the count of orders based on user role.")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
-        //[Authorize]
-        //public async Task<IActionResult> OrderCount()
-        //{
-        //    try
-        //    {
-        //          var roleName = User.FindFirstValue(ClaimTypes.Role);
-        //        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //        var orders = await _unit.OrderRepository.GetAllOrdersAsync();
-          
-        //        if (roleName == "Admin" || roleName == "الموظفين")
-        //            return Ok(orders);
-        //        else if (roleName == "التجار")
-        //        {
-        //            var merchantId = _myContext.Merchants.Where(m => m.UserId == userId).Select(m => m.Id).FirstOrDefault();
-        //            var filteredOrders = orders.Where(o => o.MerchantId == merchantId).ToList();
-        //            return Ok(filteredOrders);
-        //        }
-        //        else if (roleName == "المناديب")
-        //        {
-        //            var deliveryId = _myContext.Deliveries.Where(d => d.UserId == userId).Select(d => d.UserId).FirstOrDefault();
-        //            var filteredOrders = orders.Where(o => o.DeliveryId == deliveryId).ToList();
-        //            return Ok(filteredOrders);
-        //        }
-        //        else
-        //        {
-        //            return Forbid();
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        return StatusCode(500, "خطأ في جلب عدد الطلبات حسب دور المستخدم.");
-        //    }
-        //}
-        //#endregion
+        #region Get Order Count
+        [HttpGet("OrderCount")]
+        [SwaggerOperation(Summary = "Retrieves the count of orders based on user role.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
+        [Authorize]
+        public async Task<IActionResult> OrderCount()
+        {
+            try
+            {
+                  var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var orders = await _unit.OrderRepository.GetAllOrdersAsync();
 
-        //#region Get Orders After Filter
-        //[HttpGet("IndexAfterFilter")]
-        //[SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
-        //[SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
-        //[Authorize(Permissions.Orders.View)]
-        //public async Task<ActionResult<IEnumerable<OrderDTO>>> IndexAfterFilter(string query)
-        //{
-        //    try
-        //    {
-        //         var roleName = User.FindFirstValue(ClaimTypes.Role);
-        //        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (roleName == "Admin" || roleName == "الموظفين")
+                    return Ok(orders);
+                else if (roleName == "التجار")
+                {
+                    var merchantId = _myContext.Merchants.Where(m => m.UserId == userId).Select(m => m.Id).FirstOrDefault();
+                    var filteredOrders = orders.Where(o => o.MerchantId == merchantId).ToList();
+                    return Ok(filteredOrders);
+                }
+                else if (roleName == "المناديب")
+                {
+                    var deliveryId = _myContext.Deliveries.Where(d => d.UserId == userId).Select(d => d.Id).FirstOrDefault();
+                    var filteredOrders = orders.Where(o => o.DeliveryId == deliveryId).ToList();
+                    return Ok(filteredOrders);
+                }
+                else
+                {
+                    return Forbid();
+                }
+            }
+            catch
+            {
+                return StatusCode(500, "خطأ في جلب عدد الطلبات حسب دور المستخدم.");
+            }
+        }
+        #endregion
 
-        //        var orders = await _unit.OrderRepository.GetAllOrdersAsync();
+        #region Get Orders After Filter
+        [HttpGet("IndexAfterFilter")]
+        [SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
+        [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
+        [Authorize(Permissions.Orders.View)]
+        public async Task<ActionResult<IEnumerable<OrderDTO>>> IndexAfterFilter(string query)
+        {
+            try
+            {
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        //        var filteredOrders = orders.Where(o => o.OrderStatus == query).ToList();
+                var orders = await _unit.OrderRepository.GetAllOrdersAsync();
 
-        //        if (roleName == "Admin" || roleName == "الموظفين")
-        //            return Ok(filteredOrders);
-        //        else if (roleName == "التجار")
-        //        {
-        //            var merchantId = _myContext.Merchants.Where(m => m.UserId == userId).Select(m => m.Id).FirstOrDefault();
-        //            return Ok(filteredOrders.Where(o => o.MerchantId == merchantId).ToList());
-        //        }
-        //        else if (roleName == "المناديب")
-        //        {
-        //            var deliveryId = _myContext.Deliveries.Where(d => d.UserId == userId).Select(d => d.UserId).FirstOrDefault();
-        //            return Ok(filteredOrders.Where(o => o.DeliveryId == deliveryId).ToList());
-        //        }
-        //        else
-        //        {
-        //            return Forbid();
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        return StatusCode(500, "خطأ في جلب الطلبات بعد الفلترة.");
-        //    }
-        //}
+                var filteredOrders = orders.Where(o => o.OrderStatus == query).ToList();
 
-        //#endregion
+                if (roleName == "Admin" || roleName == "الموظفين")
+                    return Ok(filteredOrders);
+                else if (roleName == "التجار")
+                {
+                    var merchantId = _myContext.Merchants.Where(m => m.UserId == userId).Select(m => m.Id).FirstOrDefault();
+                    return Ok(filteredOrders.Where(o => o.MerchantId == merchantId).ToList());
+                }
+                else if (roleName == "المناديب")
+                {
+                    var deliveryId = _myContext.Deliveries.Where(d => d.UserId == userId).Select(d => d.Id).FirstOrDefault();
+                    return Ok(filteredOrders.Where(o => o.DeliveryId == deliveryId).ToList());
+                }
+                else
+                {
+                    return Forbid();
+                }
+            }
+            catch
+            {
+                return StatusCode(500, "خطأ في جلب الطلبات بعد الفلترة.");
+            }
+        }
+
+        #endregion
     }
 }
+// ADD / Edit / GetBranchesByGovernment /

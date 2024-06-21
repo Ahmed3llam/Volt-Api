@@ -10,12 +10,12 @@ namespace Shipping.DTO.OrderDTO
         [Required(ErrorMessage = "يجب ادخال الاسم")]
         public string ClientName { get; set; }
 
-        [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
+       [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
         [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
         public int ClientPhoneNumber1 { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال رقم الهاتف")]
-        [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
+       [RegularExpression(@"^01[0125][0-9]{8}$", ErrorMessage = "ادخل رقم هاتف صحيح كالاتى : 01224479550")]
         public int? ClientPhoneNumber2 { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال البريد الالكتروني")]

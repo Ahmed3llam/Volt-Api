@@ -24,13 +24,13 @@ namespace Shipping.UnitOfWork
         ICityRepository cityRepository;
         IGovernmentRepository governmentRepository;
         IBranchRepository branchRepository;
-        IMapper mapper;
 
-        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager,IMapper mapper)
+
+        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
         {
             this.db = db;
             this.userManager = userManager;
-            this.mapper = mapper;
+
         }
 
         public IRepository<T> Repository
@@ -45,7 +45,7 @@ namespace Shipping.UnitOfWork
         {
             get
             {
-                if (orderRepository == null) { orderRepository = new OrderRepository(db,mapper); }
+                if (orderRepository == null) { orderRepository = new OrderRepository(db); }
                 return orderRepository;
             }
         }

@@ -31,6 +31,7 @@ namespace Shipping.AutoMapperProfiles
                 .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.Status));
             #endregion
+
             #region City 
             CreateMap<City, CityDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
@@ -52,6 +53,7 @@ namespace Shipping.AutoMapperProfiles
 
                ;
             #endregion
+
             #region from UserRole to UserRoleDTO
             CreateMap<UserRole, UserRoleDTO>()
             .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
@@ -136,7 +138,8 @@ namespace Shipping.AutoMapperProfiles
         
 
         #endregion
-             #region Map Merchant - MerchantDTO
+
+            #region Map Merchant - MerchantDTO
         CreateMap<Merchant, MerchantDTO>()
                      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
                      .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
@@ -149,6 +152,7 @@ namespace Shipping.AutoMapperProfiles
                      .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent))
                      .ReverseMap();
             #endregion
+
             #region Branch Mapper
             CreateMap<Branch, BranchDTO>()
                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

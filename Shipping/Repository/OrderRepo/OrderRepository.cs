@@ -8,12 +8,12 @@ namespace Shipping.Repository.OrderRepo
     public class OrderRepository : IOrderRepository
     {
         private readonly ShippingContext _myContext;
-        private readonly IMapper _mapper;
 
-        public OrderRepository(ShippingContext myContext, IMapper mapper)
+
+        public OrderRepository(ShippingContext myContext)
         {
             _myContext = myContext ?? throw new ArgumentNullException(nameof(myContext));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+
         }
 
         public async Task<List<Order>> GetAllOrdersAsync()
@@ -33,7 +33,7 @@ namespace Shipping.Repository.OrderRepo
         }
 
 
-        public async Task<OrderDTO> GetOrderByIdAsync(int id)
+        public async Task<Order> GetOrderByIdAsync(int id)
         {
             try
             {
@@ -43,7 +43,7 @@ namespace Shipping.Repository.OrderRepo
                 if (order == null)
                     throw new Exception("الطلب غير موجود.");
 
-                return _mapper.Map<OrderDTO>(order);
+                return (order);
             }
             catch (Exception ex)
             {
@@ -51,7 +51,7 @@ namespace Shipping.Repository.OrderRepo
             }
         }
 
-        public async Task<List<OrderDTO>> GetOrdersByStatusAsync(string orderStatus)
+        public async Task<List<Order>> GetOrdersByStatusAsync(string orderStatus)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace Shipping.Repository.OrderRepo
                     .Where(o => o.OrderStatus == orderStatus && !o.IsDeleted)
                     .ToListAsync();
 
-                return _mapper.Map<List<OrderDTO>>(orders);
+                return (orders);
             }
             catch (Exception ex)
             {
@@ -67,11 +67,11 @@ namespace Shipping.Repository.OrderRepo
             }
         }
 
-        public async Task<OrderDTO> AddOrderAsync(OrderDTO orderDTO, string userId)
+        public async Task<Order> AddOrderAsync(OrderDTO Order, string userId)
         {
             try
             {
-                var city = await _myContext.Cities.FirstOrDefaultAsync(c => c.Name == orderDTO.CityName);
+                var city = await _myContext.Cities.FirstOrDefaultAsync(c => c.Name == Order.CityName);
                 var merchantId = await _myContext.Merchants
                     .Where(m => m.UserId == userId)
                     .Select(m => m.Id)
@@ -86,21 +86,21 @@ namespace Shipping.Repository.OrderRepo
                 {
                     MerchantId = merchantId,
                     CityId = city.Id,
-                    IsVillage = orderDTO.IsVillage,
-                    ClientEmail = orderDTO.ClientEmail,
-                    ClientName = orderDTO.ClientName,
-                    ClientPhoneNumber1 = orderDTO.ClientPhoneNumber1,
-                    ClientPhoneNumber2 = orderDTO.ClientPhoneNumber2,
-                    Notes = orderDTO.Notes,
-                    OrderCost = orderDTO.OrderCost,
-                    PaymentType = orderDTO.PaymentType,
-                    ShippingType = orderDTO.ShippingType,
-                    StreetName = orderDTO.StreetName,
-                    TotalWeight = orderDTO.TotalWeight,
-                    Type = orderDTO.Type,
+                    IsVillage = Order.IsVillage,
+                    ClientEmail = Order.ClientEmail,
+                    ClientName = Order.ClientName,
+                    ClientPhoneNumber1 = Order.ClientPhoneNumber1,
+                    ClientPhoneNumber2 = Order.ClientPhoneNumber2,
+                    Notes = Order.Notes,
+                    OrderCost = Order.OrderCost,
+                    PaymentType = Order.PaymentType,
+                    ShippingType = Order.ShippingType,
+                    StreetName = Order.StreetName,
+                    TotalWeight = Order.TotalWeight,
+                    Type = Order.Type,
                     GovernmentId = city.GovernmentId,
-                    ShippingCost = orderDTO.ShippingCost,
-                    orderProducts = orderDTO.OrderProducts.Select(op => new OrderProduct
+                    ShippingCost = Order.ShippingCost,
+                    orderProducts = Order.OrderProducts.Select(op => new OrderProduct
                     {
                         ProductName = op.ProductName,
                         ProductQuantity = op.ProductQuantity,
@@ -108,7 +108,7 @@ namespace Shipping.Repository.OrderRepo
                     }).ToList()
                 };
 
-                var branch = await _myContext.Branches.FirstOrDefaultAsync(b => b.Name == orderDTO.BranchName);
+                var branch = await _myContext.Branches.FirstOrDefaultAsync(b => b.Name == Order.BranchName);
                 if (branch == null)
                     throw new Exception("الفرع غير موجود.");
 
@@ -117,9 +117,9 @@ namespace Shipping.Repository.OrderRepo
                 _myContext.Orders.Add(order);
                 await _myContext.SaveChangesAsync();
 
-                orderDTO.Id = order.SerialNumber; // Update DTO with generated ID
+              
 
-                return orderDTO;
+                return order;
             }
             catch (Exception ex)
             {
@@ -127,7 +127,7 @@ namespace Shipping.Repository.OrderRepo
             }
         }
 
-        public async Task<OrderDTO> EditOrderAsync(int id, OrderDTO orderDTO)
+        public async Task<Order> EditOrderAsync(int id, OrderDTO orderDTO)
         {
             try
             {
@@ -171,7 +171,7 @@ namespace Shipping.Repository.OrderRepo
 
                 await _myContext.SaveChangesAsync();
 
-                return orderDTO;
+                return order;
             }
             catch (Exception ex)
             {
@@ -231,6 +231,7 @@ namespace Shipping.Repository.OrderRepo
             }
         }
 
+        // under 
         public async Task<List<string>> GenerateTableAsync(OrdersPlusDeliveriesDTO ordersPlusDeliveriesDTO)
         {
             try
