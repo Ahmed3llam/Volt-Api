@@ -14,6 +14,7 @@ using Shipping.Models;
 using Shipping.DTO.CityDTO;
 using Shipping.DTO.GovernmentDTO;
 using Shipping.DTO.OrderDTO;
+using Shipping.DTO.AccountDTOs;
 
 namespace Shipping.AutoMapperProfiles
 {
@@ -21,9 +22,15 @@ namespace Shipping.AutoMapperProfiles
     {
         public MappingProfile()
         {
-
-      
-
+            #region user
+            CreateMap<AppUser, UserDTO>()
+                .ForMember(dest => dest.userID, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.userName, opt => opt.MapFrom(src => src.UserName))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.Status));
+            #endregion
             #region City 
             CreateMap<City, CityDTO>()
                 .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.Id))
