@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Constants;
 using Shipping.DTO.Employee_DTOs;
 using Shipping.Models;
 using Shipping.UnitOfWork;
@@ -25,6 +27,7 @@ namespace Shipping.Controllers
 
         #region Get List Of Employees
         [HttpGet]
+        [Authorize(Permissions.Employees.View)]
         [SwaggerOperation(Summary = "Retrieves a paginated list of employees.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the list of employees.", typeof(List<EmpDTO>))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "No employees found.")]
@@ -63,6 +66,7 @@ namespace Shipping.Controllers
 
         #region Get Specific Employee
         [HttpGet("{id}")]
+        [Authorize(Permissions.Employees.View)]
         [SwaggerOperation(Summary = "Retrieves a specific employee by unique id.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the employee details.", typeof(EmpDTO))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Employee not found.")]
@@ -90,6 +94,7 @@ namespace Shipping.Controllers
 
         #region Search Employees
         [HttpGet("search")]
+        [Authorize(Permissions.Employees.View)]
         [SwaggerOperation(Summary = "Searches employees based on a query.", Description = "Searches for employees that match the given query.")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -122,6 +127,7 @@ namespace Shipping.Controllers
 
         #region Update Employee
         [HttpPut("{id}")]
+        [Authorize(Permissions.Employees.Edit)]
         [SwaggerOperation(Summary = "Updates the data of an employee.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Employee updated successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Employee ID mismatch.")]
@@ -152,6 +158,7 @@ namespace Shipping.Controllers
 
         #region Add Employee
         [HttpPost]
+        [Authorize(Permissions.Employees.Create)]
         [SwaggerOperation(Summary = "Creates a new employee.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Employee created successfully.", typeof(EmpDTO))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error.")]
@@ -177,6 +184,7 @@ namespace Shipping.Controllers
 
         #region Update Status
         [HttpPut("status/{id}")]
+        [Authorize(Permissions.Employees.Edit)]
         [SwaggerOperation(Summary = "Updates the status of an existing employee.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Employee status updated successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Employee not found.")]
@@ -207,6 +215,7 @@ namespace Shipping.Controllers
 
         #region SoftDelete
         [HttpDelete("{id}")]
+        [Authorize(Permissions.Employees.Delete)]
         [SwaggerOperation(Summary = "Soft delete for an existing employee.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Employee deleted successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Employee not found.")]

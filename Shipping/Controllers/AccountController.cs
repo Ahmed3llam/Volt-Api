@@ -12,6 +12,9 @@ using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Swashbuckle.AspNetCore.Annotations;
+using AutoMapper;
+using Shipping.DTO.Employee_DTOs;
+using static Shipping.Constants.Permissions;
 
 namespace Shipping.Controllers
 {
@@ -21,11 +24,13 @@ namespace Shipping.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _mapper = mapper;
         }
 
         #region Login
@@ -62,7 +67,10 @@ namespace Shipping.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
                 if (result.Succeeded)
                 {
-                    return Ok(new { message = "تم تسجيل الدخول", Token = tokenstring, Role = roles.FirstOrDefault() ,User=user});
+                    var UserData = _mapper.Map<UserDTO>(user);
+                    UserData.role = roles.FirstOrDefault();
+                    UserData.token = tokenstring;
+                    return Ok(new { message = "تم تسجيل الدخول",User= UserData });
                 }
                 else
                 {
@@ -112,7 +120,7 @@ namespace Shipping.Controllers
                     return BadRequest(new { message = "خطأ في تغير كلمة المرور", errors = result.Errors });
                 }
 
-                await _signInManager.SignOutAsync();
+                //await _signInManager.SignOutAsync();
                 return Ok(new { message = "تم تغير كلمة المرور بنجاح" });
             }
             else
