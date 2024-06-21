@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace Shipping.Repository
+namespace Shipping.Repository.OrderRepo
 {
     public interface IRepository<TEntity> where TEntity : class
     {

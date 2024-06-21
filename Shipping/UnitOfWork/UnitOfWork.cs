@@ -8,6 +8,7 @@ using Shipping.Repository.OrderRepo;
 using Shipping.Repository.Employee_Repository;
 using Shipping.Repository.DeliveryRepo;
 using Shipping.Repository.MerchantRepository;
+using Shipping.Repository.BranchRepository;
 
 namespace Shipping.UnitOfWork
 {
@@ -22,11 +23,14 @@ namespace Shipping.UnitOfWork
          IOrderRepository orderRepository;
         ICityRepository cityRepository;
         IGovernmentRepository governmentRepository;
+        IBranchRepository branchRepository;
+        IMapper mapper;
 
-        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
+        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager,IMapper mapper)
         {
             this.db = db;
             this.userManager = userManager;
+            this.mapper = mapper;
         }
 
         public IRepository<T> Repository
@@ -41,7 +45,7 @@ namespace Shipping.UnitOfWork
         {
             get
             {
-                if (orderRepository == null) { orderRepository = new OrderRepository(db); }
+                if (orderRepository == null) { orderRepository = new OrderRepository(db,mapper); }
                 return orderRepository;
             }
         }
@@ -84,6 +88,14 @@ namespace Shipping.UnitOfWork
             {
                 if (merchantRepository == null) { merchantRepository = new MerchantRepository(db); }
                 return merchantRepository;
+            }
+        }
+        public IBranchRepository BranchRepository
+        {
+            get
+            {
+                if (branchRepository == null) { branchRepository = new BranchRepository(db); }
+                return branchRepository;
             }
         }
 

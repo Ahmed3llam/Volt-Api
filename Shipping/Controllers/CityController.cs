@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Constants;
 using Shipping.DTO.CityDTO;
 using Shipping.Models;
 using Shipping.Repository.CityRepo;
@@ -29,7 +30,7 @@ namespace Shipping.Controllers
 
         #region GetCitiesByGovernment
         [HttpGet("government/{governmentId}")]
-        // [Authorize(Permissions.Cities.View)]
+        [Authorize(Permissions.Cities.View)]
         [SwaggerOperation(Summary = "Gets cities by government ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities.")]
         public ActionResult<IEnumerable<City>> GetCitiesByGovernment(int governmentId)
@@ -43,7 +44,7 @@ namespace Shipping.Controllers
         #region AddCity
 
         [HttpPost]
-        // [Authorize(Permissions.Cities.Create)]
+        [Authorize(Permissions.Cities.Create)]
         [SwaggerOperation(Summary = "Adds a new city.")]
         [SwaggerResponse(StatusCodes.Status201Created, "City successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
@@ -64,7 +65,7 @@ namespace Shipping.Controllers
 
         #region ChangeStatus
         [HttpPut("change-status/{id}")]
-        // [Authorize(Permissions.Cities.Edit)]
+        [Authorize(Permissions.Cities.Edit)]
         [SwaggerOperation(Summary = "Changes the status of a city.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City status successfully updated.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "City not found.")]
@@ -83,7 +84,7 @@ namespace Shipping.Controllers
 
         #region EditCity
         [HttpPut("edit/{id}")]
-        // [Authorize(Permissions.Cities.Edit)]
+        [Authorize(Permissions.Cities.Edit)]
         [SwaggerOperation(Summary = "Edits an existing city.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City successfully updated.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The ID in the URL does not match the ID in the body.")]
@@ -103,7 +104,7 @@ namespace Shipping.Controllers
 
         #region SearchCities
         [HttpGet("search")]
-        // [Authorize(Permissions.Cities.View)]
+         [Authorize(Permissions.Cities.View)]
         [SwaggerOperation(Summary = "Searches for cities by name within a specific government.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities matching the search criteria.")]
         public ActionResult<IEnumerable<City>> SearchCities([FromQuery] int governmentId, [FromQuery] string query)
@@ -125,7 +126,7 @@ namespace Shipping.Controllers
 
         #region DeleteCity
         [HttpDelete("delete/{id}")]
-        // [Authorize(Permissions.Cities.Delete)]
+        [Authorize(Permissions.Cities.Delete)]
         [SwaggerOperation(Summary = "Deletes a city by marking it as deleted.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City successfully marked as deleted.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "City not found.")]

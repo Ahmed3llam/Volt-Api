@@ -1,55 +1,49 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Shipping.DTO.OrderDTO;
 using Shipping.Models;
-using Shipping.Repository.CityRepo;
-using Shipping.Repository.GovernmentRepo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Shipping.Repository.OrderRepo
 {
     public class OrderRepository : IOrderRepository
     {
         private readonly ShippingContext _myContext;
+        private readonly IMapper _mapper;
 
-        public OrderRepository(ShippingContext myContext)
+        public OrderRepository(ShippingContext myContext, IMapper mapper)
         {
-            _myContext = myContext;
+            _myContext = myContext ?? throw new ArgumentNullException(nameof(myContext));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public async Task<List<OrderDTO>> GetAllOrdersAsync()
+        public async Task<List<Order>> GetAllOrdersAsync()
         {
             try
             {
                 var orders = await _myContext.Orders
-                    .Include(o => o.City).ThenInclude(c => c.Government)
                     .Where(o => !o.IsDeleted)
                     .ToListAsync();
 
-                return orders.Select(order => MapToOrderDTO(order)).ToList();
+                return (orders);
             }
             catch (Exception ex)
             {
-                throw new Exception("خطأ في جلب جميع الطلبات.", ex);
+                throw new Exception(ex.Message);
             }
         }
+
 
         public async Task<OrderDTO> GetOrderByIdAsync(int id)
         {
             try
             {
                 var order = await _myContext.Orders
-                    .Include(o => o.City).ThenInclude(c => c.Government)
                     .FirstOrDefaultAsync(o => o.SerialNumber == id);
 
                 if (order == null)
                     throw new Exception("الطلب غير موجود.");
 
-                return MapToOrderDTO(order);
+                return _mapper.Map<OrderDTO>(order);
             }
             catch (Exception ex)
             {
@@ -62,11 +56,10 @@ namespace Shipping.Repository.OrderRepo
             try
             {
                 var orders = await _myContext.Orders
-                    .Include(o => o.City).ThenInclude(c => c.Government)
                     .Where(o => o.OrderStatus == orderStatus && !o.IsDeleted)
                     .ToListAsync();
 
-                return orders.Select(order => MapToOrderDTO(order)).ToList();
+                return _mapper.Map<List<OrderDTO>>(orders);
             }
             catch (Exception ex)
             {
@@ -242,13 +235,18 @@ namespace Shipping.Repository.OrderRepo
         {
             try
             {
-                // Implement table generation logic using ordersPlusDeliveriesDTO
                 var table = new List<string>
                 {
-                    "Header1, Header2, Header3", // Example headers
-                    "Data1, Data2, Data3", // Example data
-                    "Data4, Data5, Data6" // More example data
+                    "Order ID, Client Name, Delivery ID" // Example headers
                 };
+
+                foreach (var order in ordersPlusDeliveriesDTO.Orders)
+                {
+                    var delivery = ordersPlusDeliveriesDTO.Deliveries.FirstOrDefault(d => d.DeliveryId == order.DeliveryId.ToString());
+                    var row = $"{order.Id}, {order.ClientName}, {delivery?.DeliveryId ?? "N/A"}";
+                    table.Add(row);
+                }
+
                 return await Task.FromResult(table);
             }
             catch (Exception ex)
@@ -256,34 +254,7 @@ namespace Shipping.Repository.OrderRepo
                 throw new Exception("خطأ في إنشاء الجدول.", ex);
             }
         }
-
-        private OrderDTO MapToOrderDTO(Order order)
-        {
-            return new OrderDTO
-            {
-                Id = order.SerialNumber,
-                ClientName = order.ClientName,
-                ClientEmail = order.ClientEmail,
-                ClientPhoneNumber1 = order.ClientPhoneNumber1,
-                ClientPhoneNumber2 = order.ClientPhoneNumber2,
-                Notes = order.Notes,
-                OrderCost = order.OrderCost,
-                PaymentType = order.PaymentType,
-                ShippingType = order.ShippingType,
-                StreetName = order.StreetName,
-                TotalWeight = order.TotalWeight,
-                Type = order.Type,
-                IsVillage = order.IsVillage,
-                GovernmentName = order.City.Government.Name,
-                CityName = order.City.Name,
-                OrderDate = order.Date,
-                OrderStatus = order.OrderStatus,
-                DeliveryId = order.DeliveryId,
-                BranchId = order.BranchId,
-                ShippingCost = order.ShippingCost,
-                TotalCost = order.TotalCost,
-                MerchantId = order.MerchantId
-            };
-        }
     }
+
 }
+

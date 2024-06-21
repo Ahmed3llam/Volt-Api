@@ -34,7 +34,6 @@ namespace Shipping.Repository.CityRepo
         public IEnumerable<City> GetAllByGovernmentName(string governmentName)
         {
             return _myContext.Cities
-                .Include(c => c.Government)
                 .Where(c => c.Government.Name == governmentName && !c.IsDeleted)
                 .ToList();
         }

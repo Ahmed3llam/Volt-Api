@@ -140,9 +140,6 @@ internal class Program
         builder.Services.AddScoped<IUnitOfWork<Government>, UnitOfWork<Government>>();
         builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();
         builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
-
-
-        //builder.Services.AddScoped<IUnitOfWork<Product>, UnitOfWork<Product>>();
         builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
         builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims > ();
 

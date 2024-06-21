@@ -12,6 +12,7 @@ using AutoMapper;
 using Shipping.DTO.CityDTO;
 using Shipping.DTO.GovernmentDTO;
 using Microsoft.VisualBasic;
+using Shipping.Constants;
 
 namespace Shipping.Controllers
 {
@@ -29,7 +30,7 @@ namespace Shipping.Controllers
 
         #region GetAllGovernments
         [HttpGet]
-        // [Authorize(Permissions.Governments.View)]
+        [Authorize(Permissions.Governments.View)]
         [SwaggerOperation(Summary = "Gets all governments.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of governments.")]
         public ActionResult<IEnumerable<Government>> GetAllGovernments()
@@ -43,7 +44,7 @@ namespace Shipping.Controllers
 
         #region AddGovernment
         [HttpPost("add")]
-        // [Authorize(Permissions.Governments.Create)]
+        [Authorize(Permissions.Governments.Create)]
         [SwaggerOperation(Summary = "Adds a new government.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Government successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
@@ -63,7 +64,7 @@ namespace Shipping.Controllers
 
         #region EditGovernment
         [HttpPut("edit/{id}")]
-        // [Authorize(Permissions.Governments.Edit)]
+        [Authorize(Permissions.Governments.Edit)]
         [SwaggerOperation(Summary = "Edits an existing government.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Government successfully updated.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The ID in the URL does not match the ID in the body.")]
@@ -83,7 +84,7 @@ namespace Shipping.Controllers
 
         #region ChangeGovernmentStatus
         [HttpPut("change-status/{id}")]
-        // [Authorize(Permissions.Governments.Edit)]
+        [Authorize(Permissions.Governments.Edit)]
         [SwaggerOperation(Summary = "Changes the status of a government.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Government status successfully updated.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Government not found.")]
@@ -102,7 +103,7 @@ namespace Shipping.Controllers
 
         #region SearchGovernments
         [HttpGet("search")]
-        // [Authorize(Permissions.Governments.View)]
+        [Authorize(Permissions.Governments.View)]
         [SwaggerOperation(Summary = "Searches for governments by name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of governments matching the search criteria.")]
         public ActionResult<IEnumerable<Government>> SearchGovernments([FromQuery] string query)
@@ -123,7 +124,7 @@ namespace Shipping.Controllers
 
         #region DeleteGovernment
         [HttpDelete("delete/{id}")]
-        // [Authorize(Permissions.Governments.Delete)]
+        [Authorize(Permissions.Governments.Delete)]
         [SwaggerOperation(Summary = "Deletes a government by marking it as deleted.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Government successfully marked as deleted.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Government not found.")]

@@ -66,33 +66,35 @@ namespace Shipping.AutoMapperProfiles
 
             #region Order
             CreateMap<Order, OrderDTO>()
-         .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SerialNumber))
-         .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.ClientName))
-         .ForMember(dest => dest.ClientPhoneNumber1, opt => opt.MapFrom(src => src.ClientPhoneNumber1))
-         .ForMember(dest => dest.ClientPhoneNumber2, opt => opt.MapFrom(src => src.ClientPhoneNumber2))
-         .ForMember(dest => dest.ClientEmail, opt => opt.MapFrom(src => src.ClientEmail))
-         .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.OrderCost))
-         .ForMember(dest => dest.TotalWeight, opt => opt.MapFrom(src => src.TotalWeight))
-         .ForMember(dest => dest.IsVillage, opt => opt.MapFrom(src => src.IsVillage))
-         .ForMember(dest => dest.StateName, opt => opt.MapFrom(src => src.City.Government.Name))
-         .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
-         .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
-         .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.Date))
-         .ForMember(dest => dest.StreetName, opt => opt.MapFrom(src => src.StreetName))
-         .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
-         .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
-         .ForMember(dest => dest.ShippingCost, opt => opt.MapFrom(src => src.ShippingCost))
-         .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.TotalCost))
-         .ForMember(dest => dest.OrderProducts, opt => opt.MapFrom(src => src.orderProducts))
-         .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
-         .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.DeliveryId))
-         .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantId))
-         .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
-         .ForMember(dest => dest.ShippingType, opt => opt.MapFrom(src => src.ShippingType))
-         .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
-         .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.OrderStatus))
-         .ReverseMap()
-            ;
+                    .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SerialNumber))
+                    .ForMember(dest => dest.ClientName, opt => opt.MapFrom(src => src.ClientName))
+                    .ForMember(dest => dest.ClientPhoneNumber1, opt => opt.MapFrom(src => src.ClientPhoneNumber1))
+                    .ForMember(dest => dest.ClientPhoneNumber2, opt => opt.MapFrom(src => src.ClientPhoneNumber2))
+                    .ForMember(dest => dest.ClientEmail, opt => opt.MapFrom(src => src.ClientEmail))
+                    .ForMember(dest => dest.OrderCost, opt => opt.MapFrom(src => src.OrderCost))
+                    .ForMember(dest => dest.TotalWeight, opt => opt.MapFrom(src => src.TotalWeight))
+                    .ForMember(dest => dest.IsVillage, opt => opt.MapFrom(src => src.IsVillage))
+                    .ForMember(dest => dest.StateName, opt => opt.MapFrom(src => src.City.Government.Name))
+                    .ForMember(dest => dest.CityName, opt => opt.MapFrom(src => src.City.Name))
+                    .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
+                    .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(src => src.Date))
+                    .ForMember(dest => dest.StreetName, opt => opt.MapFrom(src => src.StreetName))
+                    .ForMember(dest => dest.Notes, opt => opt.MapFrom(src => src.Notes))
+                    .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
+                    .ForMember(dest => dest.ShippingCost, opt => opt.MapFrom(src => src.ShippingCost))
+                    .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.TotalCost))
+                    .ForMember(dest => dest.OrderProducts, opt => opt.MapFrom(src => src.orderProducts))
+                    .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
+                    .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.DeliveryId))
+                    .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantId))
+                    .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
+                    .ForMember(dest => dest.ShippingType, opt => opt.MapFrom(src => src.ShippingType))
+                    .ForMember(dest => dest.PaymentType, opt => opt.MapFrom(src => src.PaymentType))
+                    .ForMember(dest => dest.OrderStatus, opt => opt.MapFrom(src => src.OrderStatus))
+                    .ReverseMap();
+ 
+            CreateMap<OrderProduct, OrderProductDTO>().ReverseMap();
+
 
             #endregion
 
@@ -127,7 +129,7 @@ namespace Shipping.AutoMapperProfiles
         
 
         #endregion
-        #region Map Merchant - MerchantDTO
+             #region Map Merchant - MerchantDTO
         CreateMap<Merchant, MerchantDTO>()
                      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
                      .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
