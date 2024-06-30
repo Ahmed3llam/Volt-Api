@@ -43,7 +43,7 @@ namespace Shipping.Controllers
             _mapper = mapper;
         }
 
-        #region Get Orders
+       #region Get Orders
 
         [HttpGet("Index")]
         [SwaggerOperation(Summary = "Retrieves all orders.")]
@@ -64,7 +64,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region GetOrdersDependonStatus
+       #region GetOrdersDependonStatus
         [HttpGet("GetOrdersDependonStatus")]
         [SwaggerOperation(Summary = "Retrieves orders based on status.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders based on status.")]
@@ -87,7 +87,7 @@ namespace Shipping.Controllers
         }
         #endregion 
 
-        #region SearchByClientName
+       #region SearchByClientName
         [HttpGet("SearchByClientName")]
         [SwaggerOperation(Summary = "Searches orders by client name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the client name.")]
@@ -112,7 +112,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region SearchByDeliveryName
+       #region SearchByDeliveryName
         [HttpGet("SearchByDeliveryName")]
         [SwaggerOperation(Summary = "Searches orders by delivery name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the delivery name.")]
@@ -147,7 +147,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region OrderReceipt
+       #region OrderReceipt
         [HttpGet("OrderReceipt")]
         [SwaggerOperation(Summary = "Retrieves the receipt of a specific order.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the receipt of the order.")]
@@ -172,7 +172,7 @@ namespace Shipping.Controllers
 
         #endregion
 
-        #region ChangeDelivery
+       #region ChangeDelivery
 
         [HttpPut("ChangeDelivery")]
         [SwaggerOperation(Summary = "Changes the delivery of a specific order.")]
@@ -198,7 +198,7 @@ namespace Shipping.Controllers
 
         #endregion
 
-        #region Change Order Status
+       #region Change Order Status
         [HttpPut("ChangeStatus")]
         [SwaggerOperation(Summary = "Changes the status of a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Status changed successfully.")]
@@ -222,7 +222,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region Edit Order 
+       #region Edit Order 
         [HttpPut("Edit")]
         [SwaggerOperation(Summary = "Edits a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order edited successfully.")]
@@ -253,7 +253,7 @@ namespace Shipping.Controllers
 
         #endregion
 
-        #region Add Orders
+       #region Add Orders
         [HttpPost("Add")]
         [SwaggerOperation(Summary = "Adds a new order.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Order created successfully.")]
@@ -296,7 +296,7 @@ namespace Shipping.Controllers
 
     #endregion
 
-    #region Delete Orders
+       #region Delete Orders
     [HttpDelete("Delete")]
         [SwaggerOperation(Summary = "Deletes a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order deleted successfully.")]
@@ -321,7 +321,7 @@ namespace Shipping.Controllers
 
         #endregion
 
-        #region GetCitiesByGovernment
+       #region GetCitiesByGovernment
 
         [HttpGet("GetCitiesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves cities based on government ID.")]
@@ -342,7 +342,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region GetBranchesByGovernment
+       #region GetBranchesByGovernment
         [HttpGet("GetBranchesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves branches based on government name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of branches.")]
@@ -362,7 +362,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region Get Order Count
+       #region Get Order Count
         [HttpGet("OrderCount")]
         [SwaggerOperation(Summary = "Retrieves the count of orders based on user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
@@ -401,7 +401,7 @@ namespace Shipping.Controllers
         }
         #endregion
 
-        #region Get Orders After Filter
+       #region Get Orders After Filter
         [HttpGet("IndexAfterFilter")]
         [SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
@@ -443,4 +443,4 @@ namespace Shipping.Controllers
         #endregion
     }
 }
-// ADD / Edit / GetBranchesByGovernment /
+//GetBranchesByGovernment /

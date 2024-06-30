@@ -2,6 +2,8 @@
 
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Plugins;
+using Shipping.DTO.AccountDTOs;
 using Shipping.DTO.DeliveryDTOs;
 using Shipping.Models;
 using Shipping.UnitOfWork;
@@ -104,7 +106,8 @@ namespace Shipping.Controllers
                 {
                     await unitOfWork.DeliveryRepository.SoftDeleteAsync(delivery);
                     unitOfWork.SaveChanges();
-                    return Ok("Delivery deleted successfully.");
+                    return Ok(new { Message = "Delivery deleted successfully."});
+             
                 }
                 return NotFound("Delivery not found.");
             }
@@ -113,5 +116,28 @@ namespace Shipping.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        #region Get Delivery By Id
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDeliveryById(string id)
+        {
+            try
+            {
+                var delivery = await unitOfWork.DeliveryRepository.GetById(id);
+                if (delivery == null)
+                {
+                    return NotFound($"Delivery with id {id} not found");
+                }
+                var deliveryDTO = mapper.Map<DeliveryDTO>(delivery);
+                return Ok(deliveryDTO);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to retrieve delivery: {ex.Message}");
+            }
+        }
+        #endregion
+
     }
 }

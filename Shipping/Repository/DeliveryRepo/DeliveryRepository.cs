@@ -70,10 +70,20 @@ namespace Shipping.Repository.DeliveryRepo
         #region Edit Delivery
         public async Task<Delivery> EditDelivery(string id, Delivery delivery)
         {
-            var oldDelivery = await GetById(id); 
+            var oldDelivery = await GetById(id);
 
             if (oldDelivery != null)
             {
+                // Check if the branch is already being tracked
+                var trackedBranch = context.Branches.Local.FirstOrDefault(b => b.Id == delivery.BranchId);
+
+                if (trackedBranch != null)
+                {
+                    // Detach the tracked branch
+                    context.Entry(trackedBranch).State = EntityState.Detached;
+                }
+
+                // Update the delivery fields
                 oldDelivery.Governement = delivery.Governement;
                 oldDelivery.Address = delivery.Address;
                 oldDelivery.BranchId = delivery.BranchId;
@@ -81,13 +91,17 @@ namespace Shipping.Repository.DeliveryRepo
                 oldDelivery.CompanyPercent = delivery.CompanyPercent;
                 oldDelivery.User.NormalizedEmail = delivery.User.Email.ToUpper();
 
-                await context.SaveChangesAsync(); 
+                // Attach the updated branch
+                context.Attach(delivery).State = EntityState.Modified;
 
-                return oldDelivery; 
+                await context.SaveChangesAsync();
+
+                return oldDelivery;
             }
 
             return null;
         }
+
 
         #endregion
 
