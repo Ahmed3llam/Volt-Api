@@ -15,7 +15,7 @@ namespace Shipping.DTO.DeliveryDTOs
        
         public string? Phone { get; set; }
        
-        public string BranchName { get; set; }
+        public string? BranchName { get; set; }
         
         public string Government { get; set; }
        
@@ -27,7 +27,7 @@ namespace Shipping.DTO.DeliveryDTOs
         
         public int CompanyPercentage { get; set; }
         
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         
         public int? OrignalIdOnlyInDeliveryTable { get; set; }
         
