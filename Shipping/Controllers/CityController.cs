@@ -30,7 +30,7 @@ namespace Shipping.Controllers
 
         #region GetCitiesByGovernment
         [HttpGet("government/{governmentId}")]
-        [Authorize(Permissions.Cities.View)]
+        //[Authorize(Permissions.Cities.View)]
         [SwaggerOperation(Summary = "Gets cities by government ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities.")]
         public ActionResult<IEnumerable<City>> GetCitiesByGovernment(int governmentId)
@@ -44,7 +44,7 @@ namespace Shipping.Controllers
         #region AddCity
 
         [HttpPost]
-        [Authorize(Permissions.Cities.Create)]
+        //[Authorize(Permissions.Cities.Create)]
         [SwaggerOperation(Summary = "Adds a new city.")]
         [SwaggerResponse(StatusCodes.Status201Created, "City successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
@@ -104,7 +104,7 @@ namespace Shipping.Controllers
 
         #region SearchCities
         [HttpGet("search")]
-         [Authorize(Permissions.Cities.View)]
+         //[Authorize(Permissions.Cities.View)]
         [SwaggerOperation(Summary = "Searches for cities by name within a specific government.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities matching the search criteria.")]
         public ActionResult<IEnumerable<City>> SearchCities([FromQuery] int governmentId, [FromQuery] string query)

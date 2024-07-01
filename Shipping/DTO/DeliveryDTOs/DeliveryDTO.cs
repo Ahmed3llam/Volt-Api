@@ -5,6 +5,8 @@ namespace Shipping.DTO.DeliveryDTOs
 {
     public class DeliveryDTO
     {
+        public string? Id { get; set; }
+
         public string? DeliveryId { get; set; }
         
         public string? Name { get; set; }
@@ -15,7 +17,7 @@ namespace Shipping.DTO.DeliveryDTOs
        
         public string? Phone { get; set; }
        
-        public string BranchName { get; set; }
+        public string? BranchName { get; set; }
         
         public string Government { get; set; }
        

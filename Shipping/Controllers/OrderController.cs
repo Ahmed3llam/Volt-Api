@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Shipping.Constants;
 using Shipping.DTO.BranchDTOs;
 using Shipping.DTO.CityDTO;
@@ -48,7 +49,7 @@ namespace Shipping.Controllers
         [HttpGet("Index")]
         [SwaggerOperation(Summary = "Retrieves all orders.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> Index()
         {
             try
@@ -68,7 +69,7 @@ namespace Shipping.Controllers
         [HttpGet("GetOrdersDependonStatus")]
         [SwaggerOperation(Summary = "Retrieves orders based on status.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders based on status.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> GetOrdersDependonStatus(string? status = null)
         {
             try
@@ -91,7 +92,7 @@ namespace Shipping.Controllers
         [HttpGet("SearchByClientName")]
         [SwaggerOperation(Summary = "Searches orders by client name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the client name.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> SearchByClientName(string query)
         {
             try
@@ -116,7 +117,7 @@ namespace Shipping.Controllers
         [HttpGet("SearchByDeliveryName")]
         [SwaggerOperation(Summary = "Searches orders by delivery name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the delivery name.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> SearchByDeliveryName(string query)
         {
             try
@@ -152,7 +153,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Retrieves the receipt of a specific order.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the receipt of the order.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<OrderDTO>> OrderReceipt(int id)
         {
             try
@@ -178,18 +179,19 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Changes the delivery of a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Delivery changed successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        [Authorize(Permissions.Orders.Edit)]
+        //[Authorize(Permissions.Orders.Edit)]
         public async Task<IActionResult> ChangeDelivery(int id, int deliveryId)
         {
             try
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message = "تم تغير حالة المندوب" });
 
                 await _unit.OrderRepository.UpdateOrderDeliveryAsync(id, deliveryId);
-                return Ok("تم تغير المندوب");
-            }   
+                return Ok(new { message = "تم تغير حالة المندوب" });
+
+            }
             catch
             {
                 return StatusCode(500, "خطأ في تغيير تسليم الطلب.");
@@ -203,17 +205,17 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Changes the status of a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Status changed successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        [Authorize(Permissions.Orders.Edit)]
+        //[Authorize(Permissions.Orders.Edit)]
         public async Task<IActionResult> ChangeStatus(int id, string status)
         {
             try
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message = "الطلب غير موجود." });
 
                 await _unit.OrderRepository.UpdateOrderStatusAsync(id, status);
-                return Ok("تم تغير حالة الطلب ");
+                return Ok(new { message = "تم تغير حالة الطلب" });
             }
             catch
             {
@@ -222,14 +224,14 @@ namespace Shipping.Controllers
         }
         #endregion
 
-       #region Edit Order 
-        [HttpPut("Edit")]
+        #region Edit Order 
+        [HttpPut("Edit/{id}")]
         [SwaggerOperation(Summary = "Edits a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order edited successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid order data.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        [Authorize(Permissions.Orders.Edit)]
-        public async Task<IActionResult> Edit(int id, OrderDTO orderDto)
+        //[Authorize(Permissions.Orders.Edit)]
+        public async Task<IActionResult> Edit(int id,OrderDTO orderDto)
         {
             if (ModelState.IsValid)
             {
@@ -238,10 +240,10 @@ namespace Shipping.Controllers
                     var user = await _userManager.GetUserAsync(User);
                     var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                     if (order == null)
-                        return NotFound("الطلب غير موجود.");
+                        return NotFound(new { message = "الطلب غير موجود."});
 
                     await _unit.OrderRepository.EditOrderAsync(id, orderDto);
-                    return Ok(" تم التعديل");
+                    return Ok(new { message = " تم التعديل"});
                 }
                 catch
                 {
@@ -258,7 +260,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Adds a new order.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Order created successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Failed to add order.")]
-        [Authorize(Permissions.Orders.Create)]
+        //[Authorize(Permissions.Orders.Create)]
         public async Task<IActionResult> Add(OrderDTO orderDTO)
         {
             if (!ModelState.IsValid)
@@ -274,11 +276,11 @@ namespace Shipping.Controllers
 
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, user.Id);
+                //var user = await _userManager.GetUserAsync(User);
+                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, "76f86073-b51c-47c4-b7fa-731628055ebb");
                 if (addedOrder == null)
                 {
-                    return BadRequest("فشل في إضافة الطلب.");
+                    return BadRequest(new { message =  "فشل في إضافة الطلب."});
                 }
 
                 var orderDTOResult = _mapper.Map<OrderDTO>(addedOrder);
@@ -301,17 +303,17 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Deletes a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order deleted successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        [Authorize(Permissions.Orders.Delete)]
+        //[Authorize(Permissions.Orders.Delete)]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message =  "الطلب غير موجود."});
 
                 await _unit.OrderRepository.DeleteOrderAsync(id);
-                return Ok("تم الحذف ");
+                return Ok(new { message = "تم الحذف "});
             }
             catch (Exception ex)
             {
@@ -326,7 +328,7 @@ namespace Shipping.Controllers
         [HttpGet("GetCitiesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves cities based on government ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities.")]
-        [Authorize(Permissions.Orders.Create)]
+        //[Authorize(Permissions.Orders.Create)]
         public IActionResult GetCitiesByGovernment(int governmentId)
         {
             try
@@ -346,12 +348,12 @@ namespace Shipping.Controllers
         [HttpGet("GetBranchesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves branches based on government name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of branches.")]
-        [Authorize(Permissions.Orders.Create)]
-        public  IActionResult GetBranchesByGovernment(int government)
+        //[Authorize(Permissions.Orders.Create)]
+        public async Task<IActionResult> GetBranchesByGovernmentAsync(int government)
         {
             try
             {
-                var branches =  _unit.BranchRepository.GetBranchesByGovernmentNameAsync(government);
+                var branches =  await _unit.BranchRepository.GetBranchesByGovernmentNameAsync(government);
                 var branchesDTO = _mapper.Map<List<BranchDTO>>(branches);
                 return Ok(branchesDTO);
             }
@@ -366,7 +368,7 @@ namespace Shipping.Controllers
         [HttpGet("OrderCount")]
         [SwaggerOperation(Summary = "Retrieves the count of orders based on user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> OrderCount()
         {
             try
@@ -405,7 +407,7 @@ namespace Shipping.Controllers
         [HttpGet("IndexAfterFilter")]
         [SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
-        [Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> IndexAfterFilter(string query)
         {
             try

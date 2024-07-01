@@ -12,7 +12,7 @@ using Shipping.Models;
 namespace Shipping.Migrations
 {
     [DbContext(typeof(ShippingContext))]
-    [Migration("20240618102143_v1")]
+    [Migration("20240629151209_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -194,16 +194,16 @@ namespace Shipping.Migrations
                         {
                             Id = "76f86073-b51c-47c4-b7fa-731628055ebb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c1224400-4280-419a-bf0d-66b02447bbd0",
+                            ConcurrencyStamp = "43d12d01-11db-48cf-91d2-0d312564a1d0",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
                             LockoutEnabled = true,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDlQ3h2vMd8KovLNy13Sm55tQ8CH3G09nfvznFZV1KCGrHJRtBl7MK+8WljlRUNwvg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEImtHlXIChkv6FM3yLdeqORHTOYl4+nhDmj8/djBOARocqoS0jEHteGDIMOh9h8KZQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "df4a6d9f-d6fd-4476-af5b-4d805ff1213d",
+                            SecurityStamp = "2578cc6e-215a-4bb3-a57e-bbfb1b3d2553",
                             Status = true,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -228,7 +228,8 @@ namespace Shipping.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StateId")
+                    b.Property<int?>("StateId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<bool>("Status")
@@ -436,6 +437,9 @@ namespace Shipping.Migrations
                     b.Property<int?>("DeliveryId")
                         .HasColumnType("int");
 
+                    b.Property<int>("GovernmentId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -577,28 +581,28 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = "5ab58670-8727-4b67-85d5-4199912a70bf",
-                            Date = "18/06/2024 01:21:37 م",
+                            Date = "6/29/2024 6:12:08 PM",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3773b28b-dc4e-4083-99a3-8566e1c47110",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "527cc771-c117-4ab6-ace6-b648d16075c4",
+                            Date = "6/29/2024 6:12:08 PM",
                             Name = "المناديب",
                             NormalizedName = "المناديب"
                         },
                         new
                         {
-                            Id = "94c1b123-deec-4cc4-868a-d9be7a448b52",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "1409b0fd-2c2f-464a-b6b6-cf22bb5cd970",
+                            Date = "6/29/2024 6:12:08 PM",
                             Name = "التجار",
                             NormalizedName = "التجار"
                         },
                         new
                         {
-                            Id = "aa2ac875-4170-4b7a-bf96-9acc831f30bb",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "89323855-669b-44a7-92e5-3b2d9ddbb1c6",
+                            Date = "6/29/2024 6:12:08 PM",
                             Name = "الموظفين",
                             NormalizedName = "الموظفين"
                         });
@@ -677,7 +681,7 @@ namespace Shipping.Migrations
                     b.Property<int>("Addition_Cost")
                         .HasColumnType("int");
 
-                    b.Property<int>("Cost")
+                    b.Property<int>("StandaredWeight")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -688,8 +692,8 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = 1,
-                            Addition_Cost = 100,
-                            Cost = 10
+                            Addition_Cost = 30,
+                            StandaredWeight = 10
                         });
                 });
 
