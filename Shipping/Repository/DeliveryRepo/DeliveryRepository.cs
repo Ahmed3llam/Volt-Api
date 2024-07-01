@@ -101,7 +101,7 @@ namespace Shipping.Repository.DeliveryRepo
                 Address = deliverydto.Address,
                 DiscountType = deliverydto.DiscountType,
                 CompanyPercent = deliverydto.CompanyPercentage,
-                BranchId = context.Branches.FirstOrDefault(b => b.Name == deliverydto.BranchName).Id
+                BranchId = deliverydto.BranchId
             };
 
             var user = new AppUser

@@ -3,6 +3,7 @@ using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Shipping.Constants;
 using Shipping.DTO.BranchDTOs;
 using Shipping.DTO.CityDTO;
@@ -185,11 +186,12 @@ namespace Shipping.Controllers
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message = "تم تغير حالة المندوب" });
 
                 await _unit.OrderRepository.UpdateOrderDeliveryAsync(id, deliveryId);
-                return Ok("تم تغير المندوب");
-            }   
+                return Ok(new { message = "تم تغير حالة المندوب" });
+
+            }
             catch
             {
                 return StatusCode(500, "خطأ في تغيير تسليم الطلب.");
@@ -210,10 +212,10 @@ namespace Shipping.Controllers
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message = "الطلب غير موجود." });
 
                 await _unit.OrderRepository.UpdateOrderStatusAsync(id, status);
-                return Ok("تم تغير حالة الطلب ");
+                return Ok(new { message = "تم تغير حالة الطلب" });
             }
             catch
             {
@@ -223,13 +225,13 @@ namespace Shipping.Controllers
         #endregion
 
         #region Edit Order 
-        [HttpPut("Edit")]
+        [HttpPut("Edit/{id}")]
         [SwaggerOperation(Summary = "Edits a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order edited successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid order data.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
         //[Authorize(Permissions.Orders.Edit)]
-        public async Task<IActionResult> Edit(int id, OrderDTO orderDto)
+        public async Task<IActionResult> Edit(int id,OrderDTO orderDto)
         {
             if (ModelState.IsValid)
             {
@@ -238,10 +240,10 @@ namespace Shipping.Controllers
                     var user = await _userManager.GetUserAsync(User);
                     var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                     if (order == null)
-                        return NotFound("الطلب غير موجود.");
+                        return NotFound(new { message = "الطلب غير موجود."});
 
                     await _unit.OrderRepository.EditOrderAsync(id, orderDto);
-                    return Ok(" تم التعديل");
+                    return Ok(new { message = " تم التعديل"});
                 }
                 catch
                 {
@@ -274,11 +276,11 @@ namespace Shipping.Controllers
 
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, user.Id);
+                //var user = await _userManager.GetUserAsync(User);
+                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, "76f86073-b51c-47c4-b7fa-731628055ebb");
                 if (addedOrder == null)
                 {
-                    return BadRequest("فشل في إضافة الطلب.");
+                    return BadRequest(new { message =  "فشل في إضافة الطلب."});
                 }
 
                 var orderDTOResult = _mapper.Map<OrderDTO>(addedOrder);
@@ -308,10 +310,10 @@ namespace Shipping.Controllers
             {
                 var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                 if (order == null)
-                    return NotFound("الطلب غير موجود.");
+                    return NotFound(new { message =  "الطلب غير موجود."});
 
                 await _unit.OrderRepository.DeleteOrderAsync(id);
-                return Ok("تم الحذف ");
+                return Ok(new { message = "تم الحذف "});
             }
             catch (Exception ex)
             {

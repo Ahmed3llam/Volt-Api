@@ -102,7 +102,7 @@ namespace Shipping.AutoMapperProfiles
                     .ForMember(dest => dest.TotalCost, opt => opt.MapFrom(src => src.TotalCost))
                     .ForMember(dest => dest.OrderProducts, opt => opt.MapFrom(src => src.orderProducts))
                     .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId))
-                    .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.DeliveryId))
+                    .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.Delivery.User.Name))
                     .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantId))
                     .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type))
                     .ForMember(dest => dest.ShippingType, opt => opt.MapFrom(src => src.ShippingType))
@@ -130,6 +130,7 @@ namespace Shipping.AutoMapperProfiles
             #region From Delivery To DeliveryDTO
 
             CreateMap<Delivery, DeliveryDTO>()
+                .ForMember(dest => dest.Id , opt => opt.MapFrom(src => src.Id))
                 .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.UserId))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
