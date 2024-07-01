@@ -29,7 +29,7 @@ namespace Shipping.DTO.DeliveryDTOs
         
         public int CompanyPercentage { get; set; }
         
-        public int BranchId { get; set; }
+        public int? BranchId { get; set; }
         
         public int? OrignalIdOnlyInDeliveryTable { get; set; }
         

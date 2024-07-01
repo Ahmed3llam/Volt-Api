@@ -27,6 +27,10 @@ namespace Shipping.Controllers
         }
 
         [HttpGet]
+        [Authorize(Permissions.Deliveries.View)]
+        [swagger.SwaggerOperation(Summary = "Show all Deliveries." , Description = "Retrieves a list of all Deliveries")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Deliveries successfully Retrieved.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
         public async Task<IActionResult> GetAllDeliveries()
         {
             try
@@ -44,6 +48,11 @@ namespace Shipping.Controllers
 
         // POST: api/Delivery/AddDelivery
         [HttpPost("AddDelivery")]
+        [Authorize(Permissions.Deliveries.Create)]
+        [swagger.SwaggerOperation(Summary = "Add New Delivery.", Description ="Add New Delivery on Delivery List")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Created.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> Add(DeliveryDTO newDeliveryDto)
         {
             if (!ModelState.IsValid)
@@ -66,9 +75,14 @@ namespace Shipping.Controllers
         }
 
         [HttpPut("EditDelivery/{id}")]
+        [Authorize(Permissions.Deliveries.Edit)]
+        [swagger.SwaggerOperation(Summary = "Edit Existing Delivery." ,  Description = "Edit an Existing Delivery data")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Updated.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> EditDelivery(string id, DeliveryDTO updatedDeliveryDto)
         {
-            var existingDelivery = await unitOfWork.DeliveryRepository.GetById(id.ToString());
+            var existingDelivery = await unitOfWork.DeliveryRepository.GetById(id);
             if (existingDelivery == null)
             {
                 return NotFound("Delivery not found.");
@@ -84,6 +98,11 @@ namespace Shipping.Controllers
 
 
         [HttpPut("ChangeStatus/{id}")]
+        [Authorize(Permissions.Deliveries.Edit)]
+        [swagger.SwaggerOperation(Summary = "Update Delivery Status." , Description = "Edit the status of an existing Delivery")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Status successfully Retrieved.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
+
         public async Task<IActionResult> ChangeDeliveryStatus(string id, bool status)
         {
             var delivery = await unitOfWork.DeliveryRepository.GetById(id);
@@ -97,6 +116,10 @@ namespace Shipping.Controllers
         }
 
         [HttpDelete("DeleteDelivery/{id}")]
+        [Authorize(Permissions.Deliveries.Delete)]
+        [swagger.SwaggerOperation(Summary = "Delete Delivery." ,  Description = "Delete an existing Delivery")]
+        [swagger.SwaggerResponse(StatusCodes.Status201Created, "Delivery successfully Deleted.")]
+        [swagger.SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
         public async Task<IActionResult> SoftDeleteDelivery(string id)
         {
             try

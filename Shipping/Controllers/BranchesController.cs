@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Shipping.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
+    //[ApiController]
     public class BranchController : ControllerBase
     {
         private readonly IBranchRepository _branchRepository;
