@@ -85,8 +85,20 @@ internal class Program
                    }
                    );
 
-        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-        builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.AddPolicy("Permissions.Controls.Create", policy =>
+        //        policy.RequireClaim("Permission", "Controls.Create"));
+        //    options.AddPolicy("Permissions.Controls.View", policy =>
+        //        policy.RequireClaim("Permission", "Controls.View"));
+        //    options.AddPolicy("Permissions.Controls.Edit", policy =>
+        //        policy.RequireClaim("Permission", "Controls.Edit"));
+        //    options.AddPolicy("Permissions.Controls.Delete", policy =>
+        //        policy.RequireClaim("Permission", "Controls.Delete"));
+        //});
+
+        //builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+        //builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
         #endregion
 
 
@@ -160,7 +172,7 @@ internal class Program
         var app = builder.Build();
 
 
-
+app.UseCors(txt);
 
 
         // Configure the HTTP request pipeline.
@@ -170,7 +182,7 @@ internal class Program
             app.UseSwaggerUI();
         }
 
-        app.UseCors(txt);
+        
 
         app.UseAuthentication();
         app.UseAuthorization();

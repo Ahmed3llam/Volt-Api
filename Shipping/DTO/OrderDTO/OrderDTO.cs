@@ -44,7 +44,7 @@ namespace Shipping.DTO.OrderDTO
 
         public string? Notes { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [Required(ErrorMessage = "يجب ادخال تكلفه الشحن")]
         public int ShippingCost { get; set; }
@@ -66,7 +66,7 @@ namespace Shipping.DTO.OrderDTO
         public PaymentType PaymentType { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال حاله الطلب")]
-        public string OrderStatus { get; set; }
+        public string OrderStatus { get; set; } = "جديد";
 
 
 

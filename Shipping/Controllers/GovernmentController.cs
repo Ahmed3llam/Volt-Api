@@ -30,7 +30,7 @@ namespace Shipping.Controllers
 
         #region GetAllGovernments
         [HttpGet]
-        [Authorize(Permissions.Governments.View)]
+        //[Authorize(Permissions.Governments.View)]
         [SwaggerOperation(Summary = "Gets all governments.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of governments.")]
         public ActionResult<IEnumerable<Government>> GetAllGovernments()
@@ -44,7 +44,7 @@ namespace Shipping.Controllers
 
         #region AddGovernment
         [HttpPost("add")]
-        [Authorize(Permissions.Governments.Create)]
+        //[Authorize(Permissions.Governments.Create)]
         [SwaggerOperation(Summary = "Adds a new government.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Government successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]

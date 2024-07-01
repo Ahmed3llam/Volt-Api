@@ -77,7 +77,7 @@ namespace Shipping.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Cost = table.Column<int>(type: "int", nullable: false),
+                    StandaredWeight = table.Column<int>(type: "int", nullable: false),
                     Addition_Cost = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -125,7 +125,7 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -145,7 +145,7 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -163,13 +163,13 @@ namespace Shipping.Migrations
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_AspNetUserRoles_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,7 +189,7 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,7 +212,7 @@ namespace Shipping.Migrations
                         column: x => x.StateId,
                         principalTable: "Governments",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -236,7 +236,7 @@ namespace Shipping.Migrations
                         column: x => x.GovernmentId,
                         principalTable: "Governments",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,13 +260,13 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Deliveries_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -286,13 +286,13 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Employees_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -317,13 +317,13 @@ namespace Shipping.Migrations
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Merchants_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -347,6 +347,7 @@ namespace Shipping.Migrations
                     IsVillage = table.Column<bool>(type: "bit", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     ShippingCost = table.Column<int>(type: "int", nullable: false),
+                    GovernmentId = table.Column<int>(type: "int", nullable: false),
                     StreetName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
@@ -366,7 +367,7 @@ namespace Shipping.Migrations
                         column: x => x.CityId,
                         principalTable: "Cities",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Orders_Deliveries_DeliveryId",
                         column: x => x.DeliveryId,
@@ -377,7 +378,7 @@ namespace Shipping.Migrations
                         column: x => x.MerchantId,
                         principalTable: "Merchants",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -399,7 +400,7 @@ namespace Shipping.Migrations
                         column: x => x.MerchantId,
                         principalTable: "Merchants",
                         principalColumn: "Id",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -421,7 +422,7 @@ namespace Shipping.Migrations
                         column: x => x.OrderId,
                         principalTable: "Orders",
                         principalColumn: "SerialNumber",
-                         onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.InsertData(
@@ -429,21 +430,21 @@ namespace Shipping.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Date", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "3773b28b-dc4e-4083-99a3-8566e1c47110", null, "18/06/2024 01:21:37 م", "المناديب", "المناديب" },
-                    { "5ab58670-8727-4b67-85d5-4199912a70bf", null, "18/06/2024 01:21:37 م", "Admin", "ADMIN" },
-                    { "94c1b123-deec-4cc4-868a-d9be7a448b52", null, "18/06/2024 01:21:37 م", "التجار", "التجار" },
-                    { "aa2ac875-4170-4b7a-bf96-9acc831f30bb", null, "18/06/2024 01:21:37 م", "الموظفين", "الموظفين" }
+                    { "1409b0fd-2c2f-464a-b6b6-cf22bb5cd970", null, "6/29/2024 6:12:08 PM", "التجار", "التجار" },
+                    { "527cc771-c117-4ab6-ace6-b648d16075c4", null, "6/29/2024 6:12:08 PM", "المناديب", "المناديب" },
+                    { "5ab58670-8727-4b67-85d5-4199912a70bf", null, "6/29/2024 6:12:08 PM", "Admin", "ADMIN" },
+                    { "89323855-669b-44a7-92e5-3b2d9ddbb1c6", null, "6/29/2024 6:12:08 PM", "الموظفين", "الموظفين" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "IsDeleted", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "76f86073-b51c-47c4-b7fa-731628055ebb", 0, "c1224400-4280-419a-bf0d-66b02447bbd0", "admin@gmail.com", true, false, true, null, null, "ADMIN@GMAIL.COM", "ADMIN@GMAIL.COM", "AQAAAAIAAYagAAAAEDlQ3h2vMd8KovLNy13Sm55tQ8CH3G09nfvznFZV1KCGrHJRtBl7MK+8WljlRUNwvg==", null, false, "df4a6d9f-d6fd-4476-af5b-4d805ff1213d", true, false, "admin" });
+                values: new object[] { "76f86073-b51c-47c4-b7fa-731628055ebb", 0, "43d12d01-11db-48cf-91d2-0d312564a1d0", "admin@gmail.com", true, false, true, null, null, "ADMIN@GMAIL.COM", "ADMIN@GMAIL.COM", "AQAAAAIAAYagAAAAEImtHlXIChkv6FM3yLdeqORHTOYl4+nhDmj8/djBOARocqoS0jEHteGDIMOh9h8KZQ==", null, false, "2578cc6e-215a-4bb3-a57e-bbfb1b3d2553", true, false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "weightSettings",
-                columns: new[] { "Id", "Addition_Cost", "Cost" },
-                values: new object[] { 1, 100, 10 });
+                columns: new[] { "Id", "Addition_Cost", "StandaredWeight" },
+                values: new object[] { 1, 30, 10 });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoleClaims",
