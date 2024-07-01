@@ -115,7 +115,7 @@ namespace Shipping.Repository.DeliveryRepo
                 Address = deliverydto.Address,
                 DiscountType = deliverydto.DiscountType,
                 CompanyPercent = deliverydto.CompanyPercentage,
-                BranchId = deliverydto.BranchId
+                BranchId = (int)deliverydto.BranchId
             };
 
             var user = new AppUser
