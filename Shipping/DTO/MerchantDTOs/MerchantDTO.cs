@@ -1,5 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
+﻿using Shipping.Models;
+using System.ComponentModel.DataAnnotations;
+using Shipping.DTO.SpecialCitiesPricesDTO;
 namespace Shipping.DTO.MerchantDTOs
 {
     public class MerchantDTO
@@ -33,5 +34,6 @@ namespace Shipping.DTO.MerchantDTOs
 
         public string? role { get; set; } = "التجار";
         public string? branchName { get; set; } // Change branchId to branchName
+        public  List<SpecialCitiesPriceDTO>? SpecialCitiesPrices { get; set; }
     }
 }

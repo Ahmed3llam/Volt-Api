@@ -98,6 +98,7 @@ namespace Shipping.UnitOfWork
                 return merchantRepository;
             }
         }
+
         public IBranchRepository BranchRepository
         {
             get

@@ -16,6 +16,7 @@ using Shipping.DTO.GovernmentDTO;
 using Shipping.DTO.OrderDTO;
 using Shipping.DTO.AccountDTOs;
 using Microsoft.AspNetCore.Identity;
+using Shipping.DTO.SpecialCitiesPricesDTO;
 
 namespace Shipping.AutoMapperProfiles
 {
@@ -178,7 +179,8 @@ namespace Shipping.AutoMapperProfiles
                 .ForMember(dest => dest.city, opt => opt.MapFrom(src => src.City.Name))
                 .ForMember(dest => dest.government, opt => opt.MapFrom(src => src.Government.Name))
                 .ForMember(dest => dest.pickUpSpecialCost, opt => opt.MapFrom(src => src.PickUpSpecialCost))
-                .ForMember(dest => dest.refusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent));
+                .ForMember(dest => dest.refusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent))
+                .ForMember(dest => dest.SpecialCitiesPrices, opt => opt.MapFrom(src => src.SpecialCitiesPrices));
 
             CreateMap<MerchantDTO, Merchant>()
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.id))
@@ -186,7 +188,10 @@ namespace Shipping.AutoMapperProfiles
                 .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.refusedOrderPercent))
                 .ForMember(dest => dest.BranchId, opt => opt.Ignore())
                 .ForMember(dest => dest.CityId, opt => opt.Ignore())
-                .ForMember(dest => dest.GovernmentId, opt => opt.Ignore());
+                .ForMember(dest => dest.GovernmentId, opt => opt.Ignore())
+                .ForMember(dest => dest.SpecialCitiesPrices, opt => opt.MapFrom(src => src.SpecialCitiesPrices));
+
+            
             /*
             CreateMap<Merchant, MerchantDTO>()
                     .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
@@ -233,6 +238,14 @@ namespace Shipping.AutoMapperProfiles
             #endregion
 
 
+            CreateMap<SpecialCitiesPrice, SpecialCitiesPriceDTO>()
+               .ForMember(dest => dest.Government, opt => opt.MapFrom(src => src.Government))
+               .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.City))
+               .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+               .ForMember(dest => dest.MerchantId, opt => opt.MapFrom(src => src.MerchantId));
+
+
+
         }
         public async Task<string> GetRole(AppUser user)
         {
@@ -241,6 +254,5 @@ namespace Shipping.AutoMapperProfiles
             var roles = await _userManager.GetRolesAsync(user);
             return roles.FirstOrDefault() ?? string.Empty;
         }
-
     }
 }
