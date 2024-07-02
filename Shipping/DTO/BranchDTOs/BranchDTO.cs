@@ -7,7 +7,7 @@ namespace Shipping.DTO.BranchDTOs
         public int Id { get; set; }
         public int? StateId { get; set; }
         public string Name { get; set; }
-        public DateTime Date { get; set; }= DateTime.UtcNow;
+        public DateTime? Date { get; set; }= DateTime.UtcNow;
         public bool? Status { get; set; } = true;
         public string? State {  get; set; }
 

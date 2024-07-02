@@ -9,6 +9,11 @@ using Shipping.Repository.Employee_Repository;
 using Shipping.Repository.DeliveryRepo;
 using Shipping.Repository.MerchantRepository;
 using Shipping.Repository.BranchRepository;
+using Microsoft.Extensions.Logging;
+using Microsoft.Owin.Logging;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
+
 
 namespace Shipping.UnitOfWork
 {
@@ -24,13 +29,15 @@ namespace Shipping.UnitOfWork
         ICityRepository cityRepository;
         IGovernmentRepository governmentRepository;
         IBranchRepository branchRepository;
-        private readonly ILoggerFactory _loggerFactory;
+        private readonly Microsoft.Extensions.Logging.ILoggerFactory _loggerFactory;
 
-
-        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager)
+        public UnitOfWork(ShippingContext db, UserManager<AppUser> userManager, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory)
         {
             this.db = db;
             this.userManager = userManager;
+            _loggerFactory = loggerFactory;
+
+
 
         }
 

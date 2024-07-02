@@ -37,7 +37,7 @@ namespace Shipping.Controllers
 
         #region Get the list of roles
         [HttpGet]
-        [Authorize(Permissions.Controls.View)]
+      //  [Authorize(Permissions.Controls.View)]
         [Produces("application/json")]
         [SwaggerOperation(Summary = "Get the list of roles")]
         [SwaggerResponse(StatusCodes.Status200OK, "when get the List of Roles Successfully")]
@@ -51,7 +51,7 @@ namespace Shipping.Controllers
 
         #region Create new Role
         [HttpPost]
-        [Authorize(Permissions.Controls.Create)]
+      //  [Authorize(Permissions.Controls.Create)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "Create new Role")]
@@ -107,7 +107,7 @@ namespace Shipping.Controllers
 
         #region Delete  Role
         [HttpDelete("{id}")]
-        [Authorize(Permissions.Controls.Delete)]
+       // [Authorize(Permissions.Controls.Delete)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "Delete Role")]
@@ -153,7 +153,7 @@ namespace Shipping.Controllers
 
         #region Get Permissions on roles
         [HttpGet("GetPermissionsOnRole/{id}")]
-        [Authorize(Permissions.Controls.View)]
+        //[Authorize(Permissions.Controls.View)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "Manage Permissions on roles")]
@@ -198,7 +198,7 @@ namespace Shipping.Controllers
 
         #region Edit Permissions on role
         [HttpPut("EditPermissionsOnRole/{id}")]
-        [Authorize(Permissions.Controls.View)]
+        //   [Authorize(Permissions.Controls.View)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "Manage Permissions on roles")]

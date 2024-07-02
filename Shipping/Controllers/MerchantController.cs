@@ -1,136 +1,195 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Shipping.DTO.MerchantDTOs;
 using Shipping.Models;
-using Shipping.Repository;
-using Shipping.Repository.MerchantRepository;
-
+using Shipping.UnitOfWork;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using static Shipping.Repository.MerchantRepository.IMerchantRepository;
 
 namespace Shipping.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class MerchantController : ControllerBase
     {
-        private readonly IMerchantRepository _merchantRepository;
+        private readonly IUnitOfWork<Merchant> _unitOfWork;
+        private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
 
-        public MerchantController(IMerchantRepository merchantRepository, IMapper mapper)
+        public MerchantController(IUnitOfWork<Merchant> unitOfWork, UserManager<AppUser> userManager, IMapper mapper)
         {
-            _merchantRepository = merchantRepository;
+            _unitOfWork = unitOfWork;
+            _userManager = userManager;
             _mapper = mapper;
         }
 
-        #region Get All Merchants
+        #region GetAllMerchants
+
         [HttpGet]
-        public async Task<IActionResult> GetAllMerchants()
-        {
-            var merchants = await _merchantRepository.GetAllMerchantsAsync();
-            var merchantDTOs = _mapper.Map<List<MerchantDTO>>(merchants);
-            return Ok(merchantDTOs);
-        }
-        #endregion
+        [SwaggerOperation(Summary = "Get all merchants")]
+        [SwaggerResponse(200, "Returns the list of all merchants", typeof(List<MerchantDTO>))]
+        [SwaggerResponse(500, "Internal server error")]
+        // [Authorize(Permissions.Merchant.View)]
 
-        #region Add Merchant
-        [HttpPost]
-        public async Task<IActionResult> AddMerchant(MerchantDTO merchantDTO)
+        public async Task<ActionResult<List<MerchantDTO>>> GetAllMerchants()
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("بيانات غير صالحة");
-            }
-
             try
             {
-                var merchant = _mapper.Map<Merchant>(merchantDTO);
-                var createdMerchant = await _merchantRepository.AddMerchantAsync(merchant);
-                var createdMerchantDTO = _mapper.Map<MerchantDTO>(createdMerchant);
-                return Ok(createdMerchantDTO);
+                var merchants = await _unitOfWork.MerchantRepository.GetAllMerchants();
+                var merchantDTOs = _mapper.Map<List<MerchantDTO>>(merchants);
+                return Ok(merchantDTOs);
             }
             catch (Exception ex)
             {
-                return BadRequest($"فشلت العملية: {ex.Message}");
+                return StatusCode(500, ex.Message);
             }
         }
-        #endregion
+#endregion
 
-        #region Get Merchant by ID
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetMerchantById(int id)
+        #region  AddMerchant
+        [HttpPost("AddMerchant")]
+        [SwaggerOperation(Summary = "Add a new merchant")]
+        [SwaggerResponse(200, "Merchant added successfully", typeof(MerchantDTO))]
+        [SwaggerResponse(400, "Invalid data")]
+        [SwaggerResponse(500, "Internal server error")]
+        // [Authorize(Permissions.Merchant.Create)]
+
+        public async Task<IActionResult> AddMerchant(MerchantDTO newMerchant)
         {
-            var merchant = await _merchantRepository.GetMerchantByIdAsync(id);
-            if (merchant == null)
+            if (ModelState.IsValid)
             {
-                return NotFound("التاجر غير موجود");
+                try
+                {
+                    var merchant = await _unitOfWork.MerchantRepository.Add(newMerchant, _userManager);
+                    _unitOfWork.SaveChanges();
+                    var merchantDTO = _mapper.Map<MerchantDTO>(merchant);
+                    return Ok(merchantDTO);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, ex.Message);
+                }
             }
-            var merchantDTO = _mapper.Map<MerchantDTO>(merchant);
-            return Ok(merchantDTO);
+            return BadRequest("Invalid data");
         }
-        #endregion
+#endregion
 
-        #region Update Merchant
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMerchant(int id, MerchantDTO merchantDTO)
+        #region GetMerchantById
+        [HttpGet("GetMerchantById/{id}")]
+        [SwaggerOperation(Summary = "Get a merchant by ID")]
+        [SwaggerResponse(200, "Returns the merchant", typeof(MerchantDTO))]
+        [SwaggerResponse(404, "Merchant not found")]
+        [SwaggerResponse(500, "Internal server error")]
+        // [Authorize(Permissions.Merchant.View)]
+
+        public async Task<IActionResult> GetMerchantById(string id)
         {
-            var existingMerchant = await _merchantRepository.GetMerchantByIdAsync(id);
-            if (existingMerchant == null)
+            try
             {
-                return NotFound("التاجر غير موجود");
+                var merchant = await _unitOfWork.MerchantRepository.GetMerchantByIdAsync(id);
+                if (merchant == null)
+                {
+                    return NotFound("Merchant not found");
+                }
+                var merchantDTO = _mapper.Map<MerchantDTO>(merchant);
+                return Ok(merchantDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+#endregion
+
+        #region  UpdateMerchant
+        [HttpPut("UpdateMerchant")]
+        [SwaggerOperation(Summary = "Update a merchant's details")]
+        [SwaggerResponse(200, "Merchant updated successfully", typeof(MerchantDTO))]
+        [SwaggerResponse(400, "Invalid data")]
+        [SwaggerResponse(500, "Internal server error")]
+        // [Authorize(Permissions.Merchant.Edit)]
+
+        public async Task<IActionResult> UpdateMerchant(MerchantDTO newData)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
             try
             {
-                _mapper.Map(merchantDTO, existingMerchant);
-                var updatedMerchant = await _merchantRepository.UpdateMerchantAsync(existingMerchant);
-                var updatedMerchantDTO = _mapper.Map<MerchantDTO>(updatedMerchant);
+                var merchant = await _unitOfWork.MerchantRepository.Update(newData, _userManager);
+                _unitOfWork.SaveChanges();
+                var updatedMerchantDTO = _mapper.Map<MerchantDTO>(merchant);
                 return Ok(updatedMerchantDTO);
             }
             catch (Exception ex)
             {
-                return BadRequest($"فشلت العملية: {ex.Message}");
+                return StatusCode(500, ex.Message);
             }
         }
-        #endregion
+       #endregion
 
-        #region Delete Merchant
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMerchant(int id)
+        #region UpdateStatus for merment
+        [HttpPut("UpdateStatus")]
+        [SwaggerOperation(Summary = "Update a merchant's status")]
+        [SwaggerResponse(200, "Merchant status updated successfully", typeof(MerchantDTO))]
+        [SwaggerResponse(404, "Merchant not found")]
+        [SwaggerResponse(500, "Internal server error")]
+        // [Authorize(Permissions.Merchant.Edit)]
+
+        public async Task<IActionResult> UpdateStatus(string id, bool status)
         {
-            var existingMerchant = await _merchantRepository.GetMerchantByIdAsync(id);
-            if (existingMerchant == null)
-            {
-                return NotFound("التاجر غير موجود");
-            }
-
             try
             {
-                await _merchantRepository.DeleteMerchantAsync(id);
-                return Ok("تم حذف التاجر بنجاح");
+                var merchant = await _unitOfWork.MerchantRepository.GetMerchantByIdAsync(id);
+                if (merchant == null)
+                {
+                    return NotFound("Merchant not found");
+                }
+
+                var updatedMerchant = await _unitOfWork.MerchantRepository.UpdateStatus(merchant, status);
+                _unitOfWork.SaveChanges();
+                var merchantDTO = _mapper.Map<MerchantDTO>(updatedMerchant);
+                return Ok(merchantDTO);
             }
             catch (Exception ex)
             {
-                return BadRequest($"فشلت العملية: {ex.Message}");
+                return StatusCode(500, ex.Message);
             }
         }
-        #endregion
+#endregion
 
-        #region Search For Merchant
-        [HttpGet("search")]
-        public async Task<ActionResult<List<MerchantDTO>>> SearchMerchants(string query)
+        #region DeleteMerchant
+        [HttpDelete("DeleteMerchant")]
+        [SwaggerOperation(Summary = "Delete a merchant by ID")]
+        [SwaggerResponse(200, "Merchant deleted successfully")]
+        [SwaggerResponse(404, "Merchant not found")]
+        [SwaggerResponse(500, "Internal server error")]
+        //  [Authorize(Permissions.Merchant.Delete)]
+        public async Task<IActionResult> DeleteMerchant(string id)
         {
-            if (string.IsNullOrWhiteSpace(query))
+            try
             {
-                return BadRequest("يرجى إدخال نص للبحث.");
+                var merchant = await _unitOfWork.MerchantRepository.GetMerchantByIdAsync(id);
+                if (merchant == null)
+                {
+                    return NotFound("Merchant not found");
+                }
+
+                await _unitOfWork.MerchantRepository.SoftDeleteAsync(merchant);
+                _unitOfWork.SaveChanges();
+                return Ok("Merchant deleted successfully");
             }
-
-            var merchants = await _merchantRepository.SearchMerchantsAsync(query);
-            var merchantDTOs = _mapper.Map<List<MerchantDTO>>(merchants);
-
-            return Ok(merchantDTOs);
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
         }
         #endregion
     }

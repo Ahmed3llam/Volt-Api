@@ -6,14 +6,14 @@ namespace Shipping.Repository.MerchantRepository
 {
     public interface IMerchantRepository
     {
-        
-            Task<List<Merchant>> GetAllMerchantsAsync();
-            Task<Merchant> GetMerchantByIdAsync(int id);
-            Task<Merchant> AddMerchantAsync(Merchant merchant);
-            Task<Merchant> UpdateMerchantAsync(Merchant merchant);
-            Task DeleteMerchantAsync(int id);
-            Task<List<Merchant>> SearchMerchantsAsync(string query); // Add this line
 
-       
+        Task<List<Merchant>> GetAllMerchants();
+        Task<Merchant> Add(MerchantDTO newMerchant, UserManager<AppUser> _userManager);
+        Task<Merchant> GetMerchantByIdAsync(string id);
+        List<Merchant> Search(string query);
+        Task<Merchant> Update(MerchantDTO newData, UserManager<AppUser> _userManager);
+        Task<Merchant> UpdateStatus(Merchant merchant, bool status);
+        Task SoftDeleteAsync(Merchant merchant);
+
     }
 }

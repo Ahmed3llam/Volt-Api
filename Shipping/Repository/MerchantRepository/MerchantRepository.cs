@@ -1,60 +1,171 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Shipping.DTO.MerchantDTOs;
 using Shipping.Models;
 using Shipping.Repository.MerchantRepository;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Shipping.Repository.MerchantRepository
+public class MerchantRepository : IMerchantRepository
 {
-    public class MerchantRepository:IMerchantRepository
+    private readonly ShippingContext _context;
+    private readonly UserManager<AppUser> _userManager;
+
+    public MerchantRepository(ShippingContext context, UserManager<AppUser> userManager)
     {
-        private readonly ShippingContext _context;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public MerchantRepository(ShippingContext context)
+    public async Task<List<Merchant>> GetAllMerchants()
+    {
+        return await _context.Merchants
+            .Include(m => m.User)
+            .Include(m => m.Branch)
+            .Include(m => m.City)
+            .Include(m => m.Government)
+            .ToListAsync();
+    }
+
+    public async Task<Merchant> Add(MerchantDTO newMerchant, UserManager<AppUser> _userManager)
+    {
+        // Check if email already exists
+        if (await _userManager.FindByEmailAsync(newMerchant.email) != null)
         {
-            _context = context;
+            throw new Exception("Email already exists.");
         }
 
-        public async Task<List<Merchant>> GetAllMerchantsAsync()
+        var user = new AppUser
         {
-            return await _context.Merchants.ToListAsync();
+            UserName = newMerchant.email,
+            Email = newMerchant.email,
+            PhoneNumber = newMerchant.phone,
+            Name = newMerchant.name,
+            Status = newMerchant.status ?? true
+        };
+
+        var result = await _userManager.CreateAsync(user, newMerchant.password);
+      /*  if (!result.Succeeded)
+        {
+            throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+        }*/
+
+        var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Name == newMerchant.branchName);
+        if (branch == null)
+        {
+            throw new Exception("Branch not found.");
         }
 
-        public async Task<Merchant> GetMerchantByIdAsync(int id)
+        var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == newMerchant.city);
+        if (city == null)
         {
-            return await _context.Merchants.FindAsync(id);
+            throw new Exception("City not found.");
         }
 
-        public async Task<Merchant> AddMerchantAsync(Merchant merchant)
+        var government = await _context.Governments.FirstOrDefaultAsync(g => g.Name == newMerchant.government);
+        if (government == null)
         {
-            _context.Merchants.Add(merchant);
-            await _context.SaveChangesAsync();
-            return merchant;
+            throw new Exception("Government not found.");
         }
 
-        public async Task<Merchant> UpdateMerchantAsync(Merchant merchant)
+        var merchant = new Merchant
         {
-            _context.Entry(merchant).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-            return merchant;
+            UserId = user.Id,
+            BranchId = branch.Id,
+            PickUpSpecialCost = newMerchant.pickUpSpecialCost,
+            RefusedOrderPercent = newMerchant.refusedOrderPercent,
+            CityId = city.Id,
+            GovernmentId = government.Id
+        };
+
+        _context.Merchants.Add(merchant);
+        await _context.SaveChangesAsync();
+
+        return merchant;
+    }
+
+    public async Task<Merchant> GetMerchantByIdAsync(string id)
+    {
+        return await _context.Merchants
+            .Include(m => m.User)
+            .Include(m => m.Branch)
+            .Include(m => m.City)
+            .Include(m => m.Government)
+            .FirstOrDefaultAsync(m => m.UserId == id);
+    }
+
+    public List<Merchant> Search(string query)
+    {
+        return _context.Merchants
+            .Include(m => m.User)
+            .Include(m => m.Branch)
+            .Include(m => m.City)
+            .Include(m => m.Government)
+            .Where(m => m.User.Name.Contains(query) ||
+                        m.User.Email.Contains(query) ||
+                        m.Branch.Name.Contains(query) ||
+                        m.City.Name.Contains(query) ||
+                        m.Government.Name.Contains(query))
+            .ToList();
+    }
+
+    public async Task<Merchant> Update(MerchantDTO newData, UserManager<AppUser> _userManager)
+    {
+        var merchant = await GetMerchantByIdAsync(newData.id);
+        if (merchant == null)
+        {
+            throw new Exception("Merchant not found.");
         }
 
-        public async Task DeleteMerchantAsync(int id)
-        {
-            var merchant = await _context.Merchants.FindAsync(id);
-            if (merchant != null)
-            {
-                _context.Merchants.Remove(merchant);
-                await _context.SaveChangesAsync();
-            }
-        }
+        // Update merchant details
+        merchant.User.Name = newData.name;
+        merchant.User.Email = newData.email;
+        merchant.User.PhoneNumber = newData.phone;
 
-        public async Task<List<Merchant>> SearchMerchantsAsync(string query)
+        var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Name == newData.branchName);
+        if (branch == null)
         {
-            return await _context.Merchants
-                .Where(m => m.User.Name.Contains(query) || m.Address.Contains(query) || m.City.Contains(query))
-                .ToListAsync();
+            throw new Exception("Branch not found.");
         }
+        merchant.BranchId = branch.Id;
+
+        var city = await _context.Cities.FirstOrDefaultAsync(c => c.Name == newData.city);
+        if (city == null)
+        {
+            throw new Exception("City not found.");
+        }
+        merchant.CityId = city.Id;
+
+        var government = await _context.Governments.FirstOrDefaultAsync(g => g.Name == newData.government);
+        if (government == null)
+        {
+            throw new Exception("Government not found.");
+        }
+        merchant.GovernmentId = government.Id;
+
+        merchant.PickUpSpecialCost = newData.pickUpSpecialCost;
+        merchant.RefusedOrderPercent = newData.refusedOrderPercent;
+
+        _context.Merchants.Update(merchant);
+        await _context.SaveChangesAsync();
+
+        return merchant;
+    }
+
+    public async Task<Merchant> UpdateStatus(Merchant merchant, bool status)
+    {
+        merchant.User.Status = status;
+        _context.Merchants.Update(merchant);
+        await _context.SaveChangesAsync();
+        return merchant;
+    }
+
+    public async Task SoftDeleteAsync(Merchant merchant)
+    {
+        merchant.User.Status = false;
+        _context.Merchants.Update(merchant);
+        await _context.SaveChangesAsync();
     }
 }

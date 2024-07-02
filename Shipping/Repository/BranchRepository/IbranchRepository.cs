@@ -12,5 +12,7 @@ namespace Shipping.Repository.BranchRepository
         Task<bool> ExistsAsync(int id);
         Task<List<Branch>> SearchAsync(string query);
         Task<List<Branch>> GetBranchesByGovernmentNameAsync(int governmentID);
+        Task<Branch> GetByNameAsync(string branchName);
+
     }
 }

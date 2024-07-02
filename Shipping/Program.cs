@@ -85,8 +85,7 @@ internal class Program
                    }
                    );
 
-        builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-        builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+       
         #endregion
 
 
