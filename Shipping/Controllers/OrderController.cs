@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static Shipping.Constants.Permissions;
 
 namespace Shipping.Controllers
 {
@@ -412,24 +413,33 @@ namespace Shipping.Controllers
         {
             try
             {
-                var roleName = User.FindFirstValue(ClaimTypes.Role);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                //var roleName = User.FindFirstValue(ClaimTypes.Role);
+                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var roleName = "Admin";
+                var userId = "76f86073-b51c-47c4-b7fa-731628055ebb";
 
                 var orders = await _unit.OrderRepository.GetAllOrdersAsync();
 
-                var filteredOrders = orders.Where(o => o.OrderStatus == query).ToList();
+                var ordersData = orders.Where(o => o.OrderStatus == query).ToList();
 
                 if (roleName == "Admin" || roleName == "الموظفين")
+                {
+                    var filteredOrders = _mapper.Map<List<OrderDTO>>(ordersData);
                     return Ok(filteredOrders);
+                }
                 else if (roleName == "التجار")
                 {
                     var merchantId = _myContext.Merchants.Where(m => m.UserId == userId).Select(m => m.Id).FirstOrDefault();
-                    return Ok(filteredOrders.Where(o => o.MerchantId == merchantId).ToList());
+                    ordersData = ordersData.Where(o => o.MerchantId == merchantId).ToList();
+                    var filteredOrders = _mapper.Map<List<OrderDTO>>(ordersData);
+                    return Ok(filteredOrders);
                 }
                 else if (roleName == "المناديب")
                 {
                     var deliveryId = _myContext.Deliveries.Where(d => d.UserId == userId).Select(d => d.Id).FirstOrDefault();
-                    return Ok(filteredOrders.Where(o => o.DeliveryId == deliveryId).ToList());
+                    ordersData = ordersData.Where(o => o.DeliveryId == deliveryId).ToList();
+                    var filteredOrders = _mapper.Map<List<OrderDTO>>(ordersData);
+                    return Ok(filteredOrders);
                 }
                 else
                 {
