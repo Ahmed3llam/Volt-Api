@@ -51,6 +51,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Retrieves all orders.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
         //[Authorize(Permissions.Orders.View)]
+        //[Authorize(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> Index()
         {
             try

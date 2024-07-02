@@ -64,6 +64,11 @@ namespace Shipping.Repository.BranchRepository
             var branches = await _context.Branches.Where(b=>b.StateId==governmentID).ToListAsync();
             return branches;
         }
+
+        public Task<Branch> GetByNameAsync(string branchName)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
     }

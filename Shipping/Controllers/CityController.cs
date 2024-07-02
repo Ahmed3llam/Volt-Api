@@ -45,6 +45,7 @@ namespace Shipping.Controllers
 
         [HttpPost]
         //[Authorize(Permissions.Cities.Create)]
+        //[Authorize(Permissions.Cities.Create)]
         [SwaggerOperation(Summary = "Adds a new city.")]
         [SwaggerResponse(StatusCodes.Status201Created, "City successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]
@@ -65,7 +66,7 @@ namespace Shipping.Controllers
 
         #region ChangeStatus
         [HttpPut("change-status/{id}")]
-        [Authorize(Permissions.Cities.Edit)]
+        // [Authorize(Permissions.Cities.Edit)]
         [SwaggerOperation(Summary = "Changes the status of a city.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City status successfully updated.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "City not found.")]
@@ -84,7 +85,7 @@ namespace Shipping.Controllers
 
         #region EditCity
         [HttpPut("edit/{id}")]
-        [Authorize(Permissions.Cities.Edit)]
+        //   [Authorize(Permissions.Cities.Edit)]
         [SwaggerOperation(Summary = "Edits an existing city.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City successfully updated.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "The ID in the URL does not match the ID in the body.")]
@@ -126,7 +127,7 @@ namespace Shipping.Controllers
 
         #region DeleteCity
         [HttpDelete("delete/{id}")]
-        [Authorize(Permissions.Cities.Delete)]
+        //  [Authorize(Permissions.Cities.Delete)]
         [SwaggerOperation(Summary = "Deletes a city by marking it as deleted.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "City successfully marked as deleted.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "City not found.")]

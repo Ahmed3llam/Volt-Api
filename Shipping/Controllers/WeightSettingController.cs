@@ -54,6 +54,8 @@ namespace Shipping.Controllers
         [HttpPut]
         //[Authorize(Permissions.WeightSettings.Edit)]
         //[Authorize(Permissions.WeightSettings.View)]
+        //[Authorize(Permissions.WeightSettings.Edit)]
+        //[Authorize(Permissions.WeightSettings.View)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "GetWeightSetting")]

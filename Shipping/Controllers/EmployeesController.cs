@@ -228,7 +228,7 @@ namespace Shipping.Controllers
                 if (employee == null)
                     return NotFound($"لا يوجد موظف يحمل هذا الرقم");
 
-                _unit.EmployeeRepository.SoftDeleteAsync(employee);
+                await _unit.EmployeeRepository.SoftDeleteAsync(employee);
                 _unit.SaveChanges();
 
                 return Ok(new { Status = 201, Msg = "تم حذف الموظف بنجاح" });

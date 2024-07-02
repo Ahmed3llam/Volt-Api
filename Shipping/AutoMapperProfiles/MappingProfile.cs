@@ -15,11 +15,14 @@ using Shipping.DTO.CityDTO;
 using Shipping.DTO.GovernmentDTO;
 using Shipping.DTO.OrderDTO;
 using Shipping.DTO.AccountDTOs;
+using Microsoft.AspNetCore.Identity;
 
 namespace Shipping.AutoMapperProfiles
 {
     public class MappingProfile : Profile
     {
+        private readonly UserManager<AppUser> _userManager;
+
         public MappingProfile()
         {
             #region user
@@ -163,18 +166,57 @@ namespace Shipping.AutoMapperProfiles
             #endregion
 
             #region Map Merchant - MerchantDTO
+
+
             CreateMap<Merchant, MerchantDTO>()
-                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
-                     .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-                     .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
-                     .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.User.PasswordHash))
-                     .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                     .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
-                     .ForMember(dest => dest.PickUpSpecialCost, opt => opt.MapFrom(src => src.PickUpSpecialCost))
-                     .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent))
-                     .ReverseMap();
+                .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForMember(dest => dest.branchName, opt => opt.MapFrom(src => src.Branch.Name))
+                .ForMember(dest => dest.city, opt => opt.MapFrom(src => src.City.Name))
+                .ForMember(dest => dest.government, opt => opt.MapFrom(src => src.Government.Name))
+                .ForMember(dest => dest.pickUpSpecialCost, opt => opt.MapFrom(src => src.PickUpSpecialCost))
+                .ForMember(dest => dest.refusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent));
+
+            CreateMap<MerchantDTO, Merchant>()
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.id))
+                .ForMember(dest => dest.PickUpSpecialCost, opt => opt.MapFrom(src => src.pickUpSpecialCost))
+                .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.refusedOrderPercent))
+                .ForMember(dest => dest.BranchId, opt => opt.Ignore())
+                .ForMember(dest => dest.CityId, opt => opt.Ignore())
+                .ForMember(dest => dest.GovernmentId, opt => opt.Ignore());
+            /*
+            CreateMap<Merchant, MerchantDTO>()
+                    .ForMember(dest => dest.id, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.User.Email))
+                    .ForMember(dest => dest.password, opt => opt.Ignore())
+                    .ForMember(dest => dest.name, opt => opt.MapFrom(src => src.User.Name))
+                    .ForMember(dest => dest.phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                    .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                    .ForMember(dest => dest.city, opt => opt.MapFrom(src => src.City.Name))
+                    .ForMember(dest => dest.pickUpSpecialCost, opt => opt.MapFrom(src => src.PickUpSpecialCost))
+                    .ForMember(dest => dest.refusedOrderPercent, opt => opt.MapFrom(src => src.RefusedOrderPercent))
+                    .ReverseMap();
+            CreateMap<MerchantDTO, Merchant>()
+          .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.id))
+          .ForMember(dest => dest.User.Email, opt => opt.MapFrom(src => src.email))
+          .ForMember(dest => dest.User.PasswordHash, opt => opt.MapFrom(src => src.password))
+          .ForMember(dest => dest.User.Name, opt => opt.MapFrom(src => src.name))
+          .ForMember(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.phone))
+          .ForMember(dest => dest.User.Status, opt => opt.MapFrom(src => src.status))
+         .ForMember(dest => dest.Branch.Name, opt => opt.MapFrom(src => src.branchName))
+          .ForMember(dest => dest.City.Name, opt => opt.MapFrom(src => src.city))
+          .ForMember(dest => dest.Government.Name, opt => opt.MapFrom(src => src.government))
+          .ForMember(dest => dest.PickUpSpecialCost, opt => opt.MapFrom(src => src.pickUpSpecialCost))
+          .ForMember(dest => dest.RefusedOrderPercent, opt => opt.MapFrom(src => src.refusedOrderPercent));
+            */
+
+
+
             #endregion
+
 
             #region Branch Mapper
             CreateMap<Branch, BranchDTO>()
@@ -192,5 +234,13 @@ namespace Shipping.AutoMapperProfiles
 
 
         }
+        public async Task<string> GetRole(AppUser user)
+        {
+            if (user == null) return string.Empty;
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.FirstOrDefault() ?? string.Empty;
+        }
+
     }
 }

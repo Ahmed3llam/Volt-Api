@@ -37,7 +37,7 @@ namespace Shipping.Controllers
 
         #region Get the list of roles
         [HttpGet]
-        //[Authorize(Policy = "Permissions.Controls.View")]
+      //  //[Authorize(Policy = "Permissions.Controls.View")]
         [Produces("application/json")]
         [SwaggerOperation(Summary = "Get the list of roles")]
         [SwaggerResponse(StatusCodes.Status200OK, "when get the List of Roles Successfully")]
@@ -153,6 +153,7 @@ namespace Shipping.Controllers
 
         #region Get Permissions on roles
         [HttpGet("GetPermissionsOnRole/{id}")]
+        //[Authorize(Permissions.Controls.View)]
         //[Authorize(Permissions.Controls.View)]
         [Produces("application/json")]
         [Consumes("application/json")]

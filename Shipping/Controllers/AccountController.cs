@@ -36,7 +36,7 @@ namespace Shipping.Controllers
         #region Login
         [HttpPost("login")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Authenticates a user and returns a JWT token.")]
+        //[SwaggerOperation(Summary = "Authenticates a user and returns a JWT token.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Successfully authenticated and returns a JWT token.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid email or password.")]
         public async Task<IActionResult> Login(LoginDTO login)
@@ -83,7 +83,7 @@ namespace Shipping.Controllers
 
         #region Logout
         [HttpPost("logout")]
-        [Authorize]
+       // [Authorize]
         [SwaggerOperation(Summary = "Logs out the current user.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Successfully logged out.")]
         public async Task<IActionResult> Logout()
@@ -95,7 +95,7 @@ namespace Shipping.Controllers
 
         #region Change Password
         [HttpPost("changePassword")]
-        [Authorize]
+       // [Authorize]
         [SwaggerOperation(Summary = "Changes the password for the logged-in user.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Password changed successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid password details.")]
