@@ -90,11 +90,13 @@ namespace Shipping.Controllers
             {
                 return NotFound("Delivery not found.");
             }
+            var originalId = existingDelivery.Id;
 
             mapper.Map(updatedDeliveryDto, existingDelivery);
+            existingDelivery.Id = originalId;
+
             var editedDelivery = await unitOfWork.DeliveryRepository.EditDelivery(id, existingDelivery);
             var editedDeliveryDto = mapper.Map<DeliveryDTO>(editedDelivery);
-
 
             return Ok(editedDeliveryDto);
         }

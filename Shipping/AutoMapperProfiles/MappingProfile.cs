@@ -130,26 +130,40 @@ namespace Shipping.AutoMapperProfiles
             #region From Delivery To DeliveryDTO
 
             CreateMap<Delivery, DeliveryDTO>()
-                .ForMember(dest => dest.Id , opt => opt.MapFrom(src => src.Id))
-                .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.UserId))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
-                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
-                .ForMember(dest => dest.Government, opt => opt.MapFrom(src => src.Governement))
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.User.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.PhoneNumber))
+            .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name))
+            .ForMember(dest => dest.Government, opt => opt.MapFrom(src => src.Governement))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+            .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType))
+            .ForMember(dest => dest.CompanyPercentage, opt => opt.MapFrom(src => src.CompanyPercent))
+            .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch.Id));
+
+            // Map from DeliveryDTO to Delivery
+            CreateMap<DeliveryDTO, Delivery>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForPath(dest => dest.User.Id, opt => opt.MapFrom(src => src.DeliveryId))
+                .ForPath(dest => dest.User.Name, opt => opt.MapFrom(src => src.Name))
+                .ForPath(dest => dest.User.Email, opt => opt.MapFrom(src => src.Email))
+                .ForPath(dest => dest.User.PhoneNumber, opt => opt.MapFrom(src => src.Phone))
+                .ForPath(dest => dest.Branch.Name, opt => opt.MapFrom(src => src.BranchName))
+                .ForMember(dest => dest.Governement, opt => opt.MapFrom(src => src.Government))
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.status, opt => opt.MapFrom(src => src.User.Status))
+                .ForPath(dest => dest.User.Status, opt => opt.MapFrom(src => src.status))
                 .ForMember(dest => dest.DiscountType, opt => opt.MapFrom(src => src.DiscountType))
-                .ForMember(dest => dest.CompanyPercentage, opt => opt.MapFrom(src => src.CompanyPercent))
-                .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch.Id))
-                .ReverseMap();
+                .ForMember(dest => dest.CompanyPercent, opt => opt.MapFrom(src => src.CompanyPercentage))
+                .ForPath(dest => dest.Branch.Id, opt => opt.MapFrom(src => src.BranchId));
 
-        
 
-        #endregion
+
+            #endregion
 
             #region Map Merchant - MerchantDTO
-        CreateMap<Merchant, MerchantDTO>()
+            CreateMap<Merchant, MerchantDTO>()
                      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UserId))
                      .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
                      .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.User.Name))
