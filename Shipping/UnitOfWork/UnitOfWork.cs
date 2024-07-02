@@ -94,10 +94,11 @@ namespace Shipping.UnitOfWork
         {
             get
             {
-                if (merchantRepository == null) { merchantRepository = new MerchantRepository(db); }
+                if (merchantRepository == null) { merchantRepository = new MerchantRepository(db, userManager); }
                 return merchantRepository;
             }
         }
+
         public IBranchRepository BranchRepository
         {
             get

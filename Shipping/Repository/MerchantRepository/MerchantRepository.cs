@@ -21,11 +21,7 @@ public class MerchantRepository : IMerchantRepository
 
     public async Task<List<Merchant>> GetAllMerchants()
     {
-        return await _context.Merchants
-            .Include(m => m.User)
-            .Include(m => m.Branch)
-            .Include(m => m.City)
-            .Include(m => m.Government)
+        return await _context.Merchants      
             .ToListAsync();
     }
 
@@ -47,10 +43,10 @@ public class MerchantRepository : IMerchantRepository
         };
 
         var result = await _userManager.CreateAsync(user, newMerchant.password);
-      /*  if (!result.Succeeded)
+        if (!result.Succeeded)
         {
             throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-        }*/
+        }
 
         var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Name == newMerchant.branchName);
         if (branch == null)
@@ -77,7 +73,17 @@ public class MerchantRepository : IMerchantRepository
             PickUpSpecialCost = newMerchant.pickUpSpecialCost,
             RefusedOrderPercent = newMerchant.refusedOrderPercent,
             CityId = city.Id,
-            GovernmentId = government.Id
+            GovernmentId = government.Id,
+            SpecialCitiesPrices=newMerchant.SpecialCitiesPrices.Select
+            (op => new SpecialCitiesPrice
+            {
+                Government=op.Government,
+                City=op.City,
+                Price=op.Price
+                
+            }).ToList()
+
+
         };
 
         _context.Merchants.Add(merchant);
@@ -88,21 +94,14 @@ public class MerchantRepository : IMerchantRepository
 
     public async Task<Merchant> GetMerchantByIdAsync(string id)
     {
-        return await _context.Merchants
-            .Include(m => m.User)
-            .Include(m => m.Branch)
-            .Include(m => m.City)
-            .Include(m => m.Government)
+        return await _context.Merchants        
             .FirstOrDefaultAsync(m => m.UserId == id);
     }
 
     public List<Merchant> Search(string query)
     {
         return _context.Merchants
-            .Include(m => m.User)
-            .Include(m => m.Branch)
-            .Include(m => m.City)
-            .Include(m => m.Government)
+            
             .Where(m => m.User.Name.Contains(query) ||
                         m.User.Email.Contains(query) ||
                         m.Branch.Name.Contains(query) ||
@@ -147,6 +146,16 @@ public class MerchantRepository : IMerchantRepository
 
         merchant.PickUpSpecialCost = newData.pickUpSpecialCost;
         merchant.RefusedOrderPercent = newData.refusedOrderPercent;
+        merchant.SpecialCitiesPrices = newData.SpecialCitiesPrices.Select
+
+
+          (op => new SpecialCitiesPrice
+          {
+              Government = op.Government,
+              City = op.City,
+              Price = op.Price
+
+          }).ToList();
 
         _context.Merchants.Update(merchant);
         await _context.SaveChangesAsync();
