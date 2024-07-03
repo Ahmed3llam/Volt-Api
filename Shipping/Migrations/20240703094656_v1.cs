@@ -301,13 +301,12 @@ namespace Shipping.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    PickUpSpecialCost = table.Column<int>(type: "int", nullable: false),
+                    RefusedOrderPercent = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     BranchId = table.Column<int>(type: "int", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Government = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PickUpSpecialCost = table.Column<int>(type: "int", nullable: false),
-                    RefusedOrderPercent = table.Column<int>(type: "int", nullable: false)
+                    CityId = table.Column<int>(type: "int", nullable: true),
+                    GovernmentId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -324,6 +323,16 @@ namespace Shipping.Migrations
                         principalTable: "Branches",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_Merchants_Cities_CityId",
+                        column: x => x.CityId,
+                        principalTable: "Cities",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Merchants_Governments_GovernmentId",
+                        column: x => x.GovernmentId,
+                        principalTable: "Governments",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -430,16 +439,16 @@ namespace Shipping.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Date", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "1409b0fd-2c2f-464a-b6b6-cf22bb5cd970", null, "6/29/2024 6:12:08 PM", "التجار", "التجار" },
-                    { "527cc771-c117-4ab6-ace6-b648d16075c4", null, "6/29/2024 6:12:08 PM", "المناديب", "المناديب" },
-                    { "5ab58670-8727-4b67-85d5-4199912a70bf", null, "6/29/2024 6:12:08 PM", "Admin", "ADMIN" },
-                    { "89323855-669b-44a7-92e5-3b2d9ddbb1c6", null, "6/29/2024 6:12:08 PM", "الموظفين", "الموظفين" }
+                    { "374d11a2-781b-4821-8c63-f9031a2cb37f", null, "7/3/2024 12:46:53 PM", "الموظفين", "الموظفين" },
+                    { "5ab58670-8727-4b67-85d5-4199912a70bf", null, "7/3/2024 12:46:53 PM", "Admin", "ADMIN" },
+                    { "852ebdd5-55e7-4358-8fcc-8d275b2d575b", null, "7/3/2024 12:46:53 PM", "المناديب", "المناديب" },
+                    { "c14b5250-740e-4056-96ea-ede52f6209e8", null, "7/3/2024 12:46:53 PM", "التجار", "التجار" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "IsDeleted", "LockoutEnabled", "LockoutEnd", "Name", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "Status", "TwoFactorEnabled", "UserName" },
-                values: new object[] { "76f86073-b51c-47c4-b7fa-731628055ebb", 0, "43d12d01-11db-48cf-91d2-0d312564a1d0", "admin@gmail.com", true, false, true, null, null, "ADMIN@GMAIL.COM", "ADMIN@GMAIL.COM", "AQAAAAIAAYagAAAAEImtHlXIChkv6FM3yLdeqORHTOYl4+nhDmj8/djBOARocqoS0jEHteGDIMOh9h8KZQ==", null, false, "2578cc6e-215a-4bb3-a57e-bbfb1b3d2553", true, false, "admin" });
+                values: new object[] { "76f86073-b51c-47c4-b7fa-731628055ebb", 0, "7f7ebe57-fd13-4bbb-92aa-ef394f1cecf7", "admin@gmail.com", true, false, true, null, null, "ADMIN@GMAIL.COM", "ADMIN@GMAIL.COM", "AQAAAAIAAYagAAAAEGAb2O2QV9W4CLCM9Z2yn2aR79XLq8SKXWkZPMcKEIhsnOCXNjLwgB9hSRvKqLD7+w==", null, false, "e2152d3f-8583-4080-9ed2-763152cc8c42", true, false, "admin" });
 
             migrationBuilder.InsertData(
                 table: "weightSettings",
@@ -537,6 +546,16 @@ namespace Shipping.Migrations
                 column: "BranchId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Merchants_CityId",
+                table: "Merchants",
+                column: "CityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Merchants_GovernmentId",
+                table: "Merchants",
+                column: "GovernmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Merchants_UserId",
                 table: "Merchants",
                 column: "UserId");
@@ -609,9 +628,6 @@ namespace Shipping.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Cities");
-
-            migrationBuilder.DropTable(
                 name: "Deliveries");
 
             migrationBuilder.DropTable(
@@ -622,6 +638,9 @@ namespace Shipping.Migrations
 
             migrationBuilder.DropTable(
                 name: "Branches");
+
+            migrationBuilder.DropTable(
+                name: "Cities");
 
             migrationBuilder.DropTable(
                 name: "Governments");

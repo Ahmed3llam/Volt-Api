@@ -191,16 +191,16 @@ namespace Shipping.Migrations
                         {
                             Id = "76f86073-b51c-47c4-b7fa-731628055ebb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ffea3d33-23c5-4718-bad8-d3f8e7e87a60",
+                            ConcurrencyStamp = "7f7ebe57-fd13-4bbb-92aa-ef394f1cecf7",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
                             LockoutEnabled = true,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKz+cNKevTybCiPQgFKUC2yhSDuo+EMePiF+djJoi3pnsXDzeO9khSTVlELf33bV+Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGAb2O2QV9W4CLCM9Z2yn2aR79XLq8SKXWkZPMcKEIhsnOCXNjLwgB9hSRvKqLD7+w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "6321c4c9-88cb-4053-9739-dcbd300b8682",
+                            SecurityStamp = "e2152d3f-8583-4080-9ed2-763152cc8c42",
                             Status = true,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -576,28 +576,28 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = "5ab58670-8727-4b67-85d5-4199912a70bf",
-                            Date = "7/2/2024 8:24:42 AM",
+                            Date = "7/3/2024 12:46:53 PM",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "597b180b-bb25-4b4d-a962-5cf49aaa38fc",
-                            Date = "7/2/2024 8:24:42 AM",
+                            Id = "852ebdd5-55e7-4358-8fcc-8d275b2d575b",
+                            Date = "7/3/2024 12:46:53 PM",
                             Name = "المناديب",
                             NormalizedName = "المناديب"
                         },
                         new
                         {
-                            Id = "14bd1c1b-67a3-4232-82b0-1f0c8e8bb5ca",
-                            Date = "7/2/2024 8:24:42 AM",
+                            Id = "c14b5250-740e-4056-96ea-ede52f6209e8",
+                            Date = "7/3/2024 12:46:53 PM",
                             Name = "التجار",
                             NormalizedName = "التجار"
                         },
                         new
                         {
-                            Id = "f6f25a99-f05f-4b50-b63d-51adcc76b8f3",
-                            Date = "7/2/2024 8:24:42 AM",
+                            Id = "374d11a2-781b-4821-8c63-f9031a2cb37f",
+                            Date = "7/3/2024 12:46:53 PM",
                             Name = "الموظفين",
                             NormalizedName = "الموظفين"
                         });
