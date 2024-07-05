@@ -13,6 +13,8 @@ using Shipping.DTO.CityDTO;
 using Shipping.DTO.GovernmentDTO;
 using Microsoft.VisualBasic;
 using Shipping.Constants;
+using Shipping.CustomAuth;
+using System.Security.Claims;
 
 namespace Shipping.Controllers
 {
@@ -29,8 +31,8 @@ namespace Shipping.Controllers
         }
 
         #region GetAllGovernments
-        [HttpGet]
-        //[Authorize(Permissions.Governments.View)]
+        [HttpGet]     
+        [Permission(Permissions.Governments.View)]
         [SwaggerOperation(Summary = "Gets all governments.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of governments.")]
         public ActionResult<IEnumerable<Government>> GetAllGovernments()
@@ -44,7 +46,7 @@ namespace Shipping.Controllers
 
         #region AddGovernment
         [HttpPost("add")]
-        //[Authorize(Permissions.Governments.Create)]
+        [Permission(Permissions.Governments.Create)]
         [SwaggerOperation(Summary = "Adds a new government.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Government successfully created.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid data. Please check the provided information.")]

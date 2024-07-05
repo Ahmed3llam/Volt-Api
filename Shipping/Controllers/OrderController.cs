@@ -50,8 +50,7 @@ namespace Shipping.Controllers
         [HttpGet("Index")]
         [SwaggerOperation(Summary = "Retrieves all orders.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
-        //[Authorize(Permissions.Orders.View)]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> Index()
         {
             try
@@ -71,7 +70,7 @@ namespace Shipping.Controllers
         [HttpGet("GetOrdersDependonStatus")]
         [SwaggerOperation(Summary = "Retrieves orders based on status.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders based on status.")]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> GetOrdersDependonStatus(string? status = null)
         {
             try
@@ -94,7 +93,7 @@ namespace Shipping.Controllers
         [HttpGet("SearchByClientName")]
         [SwaggerOperation(Summary = "Searches orders by client name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the client name.")]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<List<OrderDTO>>> SearchByClientName(string query)
         {
             try
@@ -119,7 +118,7 @@ namespace Shipping.Controllers
         [HttpGet("SearchByDeliveryName")]
         [SwaggerOperation(Summary = "Searches orders by delivery name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders that match the delivery name.")]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> SearchByDeliveryName(string query)
         {
             try
@@ -155,7 +154,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Retrieves the receipt of a specific order.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns the receipt of the order.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<OrderDTO>> OrderReceipt(int id)
         {
             try
@@ -181,7 +180,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Changes the delivery of a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Delivery changed successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        //[Authorize(Permissions.Orders.Edit)]
+        [Permission(Permissions.Orders.Edit)]
         public async Task<IActionResult> ChangeDelivery(int id, int deliveryId)
         {
             try
@@ -207,7 +206,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Changes the status of a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Status changed successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        //[Authorize(Permissions.Orders.Edit)]
+        [Permission(Permissions.Orders.Edit)]
         public async Task<IActionResult> ChangeStatus(int id, string status)
         {
             try
@@ -232,7 +231,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order edited successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid order data.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        //[Authorize(Permissions.Orders.Edit)]
+        [Permission(Permissions.Orders.Edit)]
         public async Task<IActionResult> Edit(int id,OrderDTO orderDto)
         {
             if (ModelState.IsValid)
@@ -262,7 +261,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Adds a new order.")]
         [SwaggerResponse(StatusCodes.Status201Created, "Order created successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Failed to add order.")]
-        //[Authorize(Permissions.Orders.Create)]
+        [Permission(Permissions.Orders.Create)]
         public async Task<IActionResult> Add(OrderDTO orderDTO)
         {
             if (!ModelState.IsValid)
@@ -305,7 +304,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Deletes a specific order.")]
         [SwaggerResponse(StatusCodes.Status204NoContent, "Order deleted successfully.")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Order not found.")]
-        //[Authorize(Permissions.Orders.Delete)]
+        [Permission(Permissions.Orders.Delete)]
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -330,7 +329,7 @@ namespace Shipping.Controllers
         [HttpGet("GetCitiesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves cities based on government ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities.")]
-        //[Authorize(Permissions.Orders.Create)]
+        [Permission(Permissions.Orders.Create)]
         public IActionResult GetCitiesByGovernment(int governmentId)
         {
             try
@@ -350,7 +349,7 @@ namespace Shipping.Controllers
         [HttpGet("GetBranchesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves branches based on government name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of branches.")]
-        //[Authorize(Permissions.Orders.Create)]
+        [Permission(Permissions.Orders.Create)]
         public async Task<IActionResult> GetBranchesByGovernmentAsync(int government)
         {
             try
@@ -370,7 +369,7 @@ namespace Shipping.Controllers
         [HttpGet("OrderCount")]
         [SwaggerOperation(Summary = "Retrieves the count of orders based on user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of orders.")]
-        //[Authorize]
+        [Permission("anyUser")]
         public async Task<IActionResult> OrderCount()
         {
             try
@@ -409,7 +408,7 @@ namespace Shipping.Controllers
         [HttpGet("IndexAfterFilter")]
         [SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
-        //[Authorize(Permissions.Orders.View)]
+        [Permission(Permissions.Orders.View)]
         public async Task<ActionResult<IEnumerable<OrderDTO>>> IndexAfterFilter(string query)
         {
             try
