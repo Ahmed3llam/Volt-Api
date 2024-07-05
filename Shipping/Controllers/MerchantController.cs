@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Shipping.Constants;
 using Shipping.DTO.MerchantDTOs;
 using Shipping.Models;
 using Shipping.UnitOfWork;
@@ -14,7 +15,6 @@ namespace Shipping.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class MerchantController : ControllerBase
     {
         private readonly IUnitOfWork<Merchant> _unitOfWork;
@@ -34,8 +34,7 @@ namespace Shipping.Controllers
         [SwaggerOperation(Summary = "Get all merchants")]
         [SwaggerResponse(200, "Returns the list of all merchants", typeof(List<MerchantDTO>))]
         [SwaggerResponse(500, "Internal server error")]
-        // [Authorize(Permissions.Merchant.View)]
-
+        [Permission(Permissions.Merchants.View)]
         public async Task<ActionResult<List<MerchantDTO>>> GetAllMerchants()
         {
             try
@@ -57,8 +56,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(200, "Merchant added successfully", typeof(MerchantDTO))]
         [SwaggerResponse(400, "Invalid data")]
         [SwaggerResponse(500, "Internal server error")]
-        // [Authorize(Permissions.Merchant.Create)]
-
+        [Permission(Permissions.Merchants.Create)]
         public async Task<IActionResult> AddMerchant(MerchantDTO newMerchant)
         {
             if (ModelState.IsValid)
@@ -85,7 +83,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(200, "Returns the merchant", typeof(MerchantDTO))]
         [SwaggerResponse(404, "Merchant not found")]
         [SwaggerResponse(500, "Internal server error")]
-        // [Authorize(Permissions.Merchant.View)]
+        [Permission(Permissions.Merchants.View)]
 
         public async Task<IActionResult> GetMerchantById(string id)
         {
@@ -112,7 +110,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(200, "Merchant updated successfully", typeof(MerchantDTO))]
         [SwaggerResponse(400, "Invalid data")]
         [SwaggerResponse(500, "Internal server error")]
-        // [Authorize(Permissions.Merchant.Edit)]
+        [Permission(Permissions.Merchants.Edit)]
 
         public async Task<IActionResult> UpdateMerchant(MerchantDTO newData)
         {
@@ -141,7 +139,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(200, "Merchant status updated successfully", typeof(MerchantDTO))]
         [SwaggerResponse(404, "Merchant not found")]
         [SwaggerResponse(500, "Internal server error")]
-        // [Authorize(Permissions.Merchant.Edit)]
+        [Permission(Permissions.Merchants.Edit)]
 
         public async Task<IActionResult> UpdateStatus(string id, bool status)
         {
@@ -171,7 +169,7 @@ namespace Shipping.Controllers
         [SwaggerResponse(200, "Merchant deleted successfully")]
         [SwaggerResponse(404, "Merchant not found")]
         [SwaggerResponse(500, "Internal server error")]
-        //  [Authorize(Permissions.Merchant.Delete)]
+        [Permission(Permissions.Merchants.Delete)]
         public async Task<IActionResult> DeleteMerchant(string id)
         {
             try

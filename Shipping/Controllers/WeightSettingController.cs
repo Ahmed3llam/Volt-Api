@@ -35,7 +35,7 @@ namespace Shipping.Controllers
 
         #region Get Weight Setting
         [HttpGet]
-        //[Authorize(Permissions.WeightSettings.View)]
+        [Permission(Permissions.WeightSettings.View)]
         [Produces("application/json")]
         [SwaggerOperation(Summary = "GetWeightSetting")]
         [SwaggerResponse(StatusCodes.Status200OK,"when get Weight Settings Successfully")]
@@ -52,10 +52,10 @@ namespace Shipping.Controllers
 
         #region Edit Weight Setting
         [HttpPut]
-        //[Authorize(Permissions.WeightSettings.Edit)]
-        //[Authorize(Permissions.WeightSettings.View)]
-        //[Authorize(Permissions.WeightSettings.Edit)]
-        //[Authorize(Permissions.WeightSettings.View)]
+        [Permission(Permissions.WeightSettings.Edit)]
+        [Permission(Permissions.WeightSettings.View)]
+        [Permission(Permissions.WeightSettings.Edit)]
+        [Permission(Permissions.WeightSettings.View)]
         [Produces("application/json")]
         [Consumes("application/json")]
         [SwaggerOperation(Summary = "GetWeightSetting")]

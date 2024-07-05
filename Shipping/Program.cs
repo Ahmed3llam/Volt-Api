@@ -8,31 +8,27 @@ using Shipping.Models;
 using Shipping.UnitOfWork;
 using Shipping.Repository.ArabicNamesForRoleClaims;
 using Microsoft.AspNetCore.Authorization;
-using Shipping.CustomAuth;
 using Microsoft.AspNetCore.Http.Features;
 using Shipping.Repository.Employee_Repository;
 using Shipping.AutoMapperProfiles;
-using Microsoft.Extensions.DependencyInjection;
 using Shipping.Repository.DeliveryRepo;
 using Microsoft.AspNetCore.Hosting;
 using Shipping.Repository.MerchantRepository;
-using Shipping.AutoMapperProfiles;
 using Shipping.Repository.BranchRepository;
+using Shipping.CustomAuth.RoleClaimService;
+using Shipping.CustomAuth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 internal class Program
 {
     private static void Main(string[] args)
     {
-        string txt = "";
-
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
-
-
-        #region for Swagger Doc To Allow sending Token 
+        #region Swagger Configuration
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            c.SwaggerDoc("v1", new OpenApiInfo
             {
                 Title = "Shipping System API",
                 Version = "v1"
@@ -41,67 +37,46 @@ internal class Program
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
-                Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+                Type = SecuritySchemeType.ApiKey,
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
-                In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-                Description = "Here Enter JWT Token with bearer format like bearer [space] token"
+                In = ParameterLocation.Header,
+                Description = "Enter JWT Token with 'Bearer' prefix"
             });
 
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
                 {
+                    new OpenApiSecurityScheme
                     {
-                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+                        Reference = new OpenApiReference
                         {
-                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                            {
-                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] { }
-                    }
-                });
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] {}
+                }
+            });
         });
         #endregion
 
+        #region Authentication Configuration
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                var key = Encoding.ASCII.GetBytes("Iti Pd And Bi 44 Menoufia Shipping System For GP");
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateIssuerSigningKey = true,
+                    ValidateAudience = false,
+                };
+            });
 
-        #region Custom Authentication 
-
-
-        builder.Services.AddAuthentication(option => option.DefaultAuthenticateScheme = "schema")
-                   .AddJwtBearer("schema",
-                   op =>
-                   {
-                       string key = "Iti Pd And Bi 44 Menoufia Shipping System For GP";
-                       var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
-
-                       op.TokenValidationParameters = new TokenValidationParameters()
-                       {
-                           IssuerSigningKey = secertkey,
-                           ValidateIssuer = false,
-                           ValidateAudience = false
-                       };
-                   }
-                   );
-
-        //builder.Services.AddAuthorization(options =>
-        //{
-        //    options.AddPolicy("Permissions.Controls.Create", policy =>
-        //        policy.RequireClaim("Permission", "Controls.Create"));
-        //    options.AddPolicy("Permissions.Controls.View", policy =>
-        //        policy.RequireClaim("Permission", "Controls.View"));
-        //    options.AddPolicy("Permissions.Controls.Edit", policy =>
-        //        policy.RequireClaim("Permission", "Controls.Edit"));
-        //    options.AddPolicy("Permissions.Controls.Delete", policy =>
-        //        policy.RequireClaim("Permission", "Controls.Delete"));
-        //});
-
-        //builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
-        //builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
+        builder.Services.AddScoped<IRoleClaimService, RoleClaimService>();
         #endregion
-
-
 
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
@@ -110,42 +85,35 @@ internal class Program
 
         builder.Services.AddEndpointsApiExplorer();
 
+        #region Identity Configuration
+        builder.Services.AddIdentity<AppUser, UserRole>(options =>
+        {
+            options.User.RequireUniqueEmail = true;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireDigit = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequiredLength = 8;
+        }).AddEntityFrameworkStores<ShippingContext>();
+        #endregion
 
+        #region CORS Configuration
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin()
+                      .AllowAnyMethod()
+                      .AllowAnyHeader();
+            });
+        });
+        #endregion
 
-     
-
+        #region Dependency Injection
         builder.Services.AddDbContext<ShippingContext>(options =>
         {
             options.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("Db"));
-            //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         });
-
-
-
-        builder.Services.AddIdentity<AppUser, UserRole>(
-                    options =>
-                    {
-                        options.User.RequireUniqueEmail = true;
-                        options.Password.RequireNonAlphanumeric = false;
-                        options.Password.RequireDigit = false;
-                        options.Password.RequireUppercase = false;
-                        options.Password.RequireLowercase = false;
-                        options.Password.RequiredLength = 8;
-                    }).AddEntityFrameworkStores<ShippingContext>();
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy(txt,
-            builder =>
-            {
-                builder.AllowAnyOrigin();
-                builder.AllowAnyMethod();
-                builder.AllowAnyHeader();
-            });
-        });
-
-
-        #region register UnitOfWork & Configuration & myServices 
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
         builder.Services.AddScoped<IUnitOfWork<Order>, UnitOfWork<Order>>();
         builder.Services.AddScoped<IUnitOfWork<City>, UnitOfWork<City>>();
@@ -153,41 +121,30 @@ internal class Program
         builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();
         builder.Services.AddScoped<IUnitOfWork<Employee>, UnitOfWork<Employee>>();
         builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
-        builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims > ();
-
-        #endregion
-
-
-        //use autoMapper
-
-        builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-
-
+        builder.Services.AddScoped<IAddArabicNamesForRoleClaims, AddArabicNamesForRoleClaims>();
         builder.Services.AddScoped<IMerchantRepository, MerchantRepository>();
         builder.Services.AddScoped<IUnitOfWork<Merchant>, UnitOfWork<Merchant>>();
         builder.Services.AddScoped<IBranchRepository, BranchRepository>();
         builder.Services.AddScoped<IUnitOfWork<Branch>, UnitOfWork<Branch>>();
+        builder.Services.AddAutoMapper(typeof(MappingProfile));
+        #endregion
 
         var app = builder.Build();
 
+        #region Middleware Pipeline
+        app.UseCors("AllowAll");
 
-app.UseCors(txt);
-
-
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
 
-        
-
         app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllers();
+        #endregion
 
         app.Run();
     }

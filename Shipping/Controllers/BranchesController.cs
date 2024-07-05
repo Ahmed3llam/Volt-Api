@@ -30,7 +30,7 @@ namespace Shipping.Controllers
         /// </summary>
         /// <returns>A list of branches.</returns>
         [HttpGet]
-       // [Authorize(Permissions.Branch.View)]
+        [Permission(Permissions.Branches.View)]
         [SwaggerOperation(Summary = "Gets all branches", Description = "Retrieves a list of all branches")]
         [SwaggerResponse(StatusCodes.Status200OK, "List of branches retrieved successfully", typeof(List<BranchDTO>))]
         [SwaggerResponse(StatusCodes.Status500InternalServerError, "Internal server error")]
@@ -50,7 +50,7 @@ namespace Shipping.Controllers
         /// <param name="id">The ID of the branch.</param>
         /// <returns>A branch.</returns>
         [HttpGet("{id}")]
-       // [Authorize(Permissions.Branch.View)]
+        [Permission(Permissions.Branches.View)]
         [SwaggerOperation(Summary = "Gets a branch by ID", Description = "Retrieves a branch by its ID")]
         [SwaggerResponse(StatusCodes.Status200OK, "Branch retrieved successfully", typeof(BranchDTO))]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Branch not found")]
@@ -75,7 +75,7 @@ namespace Shipping.Controllers
         /// <param name="branchDTO">The branch DTO.</param>
         /// <returns>The created branch.</returns>
         [HttpPost]
-       // [Authorize(Permissions.Branch.Create)]
+        [Permission(Permissions.Branches.Create)]
         [SwaggerOperation(Summary = "Adds a new branch", Description = "Creates a new branch")]
         [SwaggerResponse(StatusCodes.Status201Created, "Branch created successfully", typeof(BranchDTO))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request data")]
@@ -98,7 +98,7 @@ namespace Shipping.Controllers
         /// <param name="branchDTO">The branch DTO.</param>
         /// <returns>The updated branch.</returns>
         [HttpPut("{id}")]
-       // [Authorize(Permissions.Branch.Edit)]
+        [Permission(Permissions.Branches.Edit)]
         [SwaggerOperation(Summary = "Updates an existing branch", Description = "Updates a branch by its ID")]
         [SwaggerResponse(StatusCodes.Status200OK, "Branch updated successfully", typeof(BranchDTO))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid request data or ID mismatch")]
@@ -136,7 +136,7 @@ namespace Shipping.Controllers
         /// <param name="id">The ID of the branch.</param>
         /// <returns>A status message.</returns>
         [HttpDelete("{id}")]
-       //  [Authorize(Permissions.Branch.Delete)]
+        [Permission(Permissions.Branches.Delete)]
         [SwaggerOperation(Summary = "Deletes a branch by ID", Description = "Deletes a branch by its ID")]
         [SwaggerResponse(StatusCodes.Status200OK, "Branch deleted successfully")]
         [SwaggerResponse(StatusCodes.Status404NotFound, "Branch not found")]
@@ -167,7 +167,7 @@ namespace Shipping.Controllers
         /// <param name="query">The search query.</param>
         /// <returns>A list of matching branches.</returns>
         [HttpGet("search")]
-       // [Authorize(Permissions.Branch.View)]
+        [Permission(Permissions.Branches.View)]
         [SwaggerOperation(Summary = "Searches for branches by query", Description = "Searches for branches based on a query string")]
         [SwaggerResponse(StatusCodes.Status200OK, "Branches retrieved successfully", typeof(List<BranchDTO>))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid search query")]

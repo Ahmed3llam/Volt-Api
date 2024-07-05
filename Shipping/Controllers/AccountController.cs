@@ -83,7 +83,7 @@ namespace Shipping.Controllers
 
         #region Logout
         [HttpPost("logout")]
-       // [Authorize]
+        [Permission("anyUser")]
         [SwaggerOperation(Summary = "Logs out the current user.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Successfully logged out.")]
         public async Task<IActionResult> Logout()
@@ -95,7 +95,7 @@ namespace Shipping.Controllers
 
         #region Change Password
         [HttpPost("changePassword")]
-       // [Authorize]
+        [Permission("anyUser")]
         [SwaggerOperation(Summary = "Changes the password for the logged-in user.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Password changed successfully.")]
         [SwaggerResponse(StatusCodes.Status400BadRequest, "Invalid password details.")]
