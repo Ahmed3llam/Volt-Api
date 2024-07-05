@@ -191,16 +191,16 @@ namespace Shipping.Migrations
                         {
                             Id = "76f86073-b51c-47c4-b7fa-731628055ebb",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c1224400-4280-419a-bf0d-66b02447bbd0",
+                            ConcurrencyStamp = "32ab12f6-20d6-497f-940b-4a5e947e89db",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             IsDeleted = false,
                             LockoutEnabled = true,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDlQ3h2vMd8KovLNy13Sm55tQ8CH3G09nfvznFZV1KCGrHJRtBl7MK+8WljlRUNwvg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEZyZUpcwqZFvYOQuTadUbAJgFaNZADXdjzHUV6TOwhWXrwFlUAhprCpIQIHzCyCrg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "df4a6d9f-d6fd-4476-af5b-4d805ff1213d",
+                            SecurityStamp = "94cead1b-436a-44c3-bb08-4991546020f6",
                             Status = true,
                             TwoFactorEnabled = false,
                             UserName = "admin"
@@ -225,7 +225,8 @@ namespace Shipping.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StateId")
+                    b.Property<int?>("StateId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<bool>("Status")
@@ -365,20 +366,14 @@ namespace Shipping.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("BranchId")
                         .HasColumnType("int");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("CityId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("Government")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("GovernmentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("PickUpSpecialCost")
                         .HasColumnType("int");
@@ -393,6 +388,10 @@ namespace Shipping.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BranchId");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("GovernmentId");
 
                     b.HasIndex("UserId");
 
@@ -431,6 +430,9 @@ namespace Shipping.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DeliveryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GovernmentId")
                         .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
@@ -574,28 +576,28 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = "5ab58670-8727-4b67-85d5-4199912a70bf",
-                            Date = "18/06/2024 01:21:37 م",
+                            Date = "05/07/2024 01:02:07 م",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "3773b28b-dc4e-4083-99a3-8566e1c47110",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "cbff0e83-f3ba-4184-826b-df5d21636f81",
+                            Date = "05/07/2024 01:02:07 م",
                             Name = "المناديب",
                             NormalizedName = "المناديب"
                         },
                         new
                         {
-                            Id = "94c1b123-deec-4cc4-868a-d9be7a448b52",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "e178d070-9148-4278-a68d-292a0973b929",
+                            Date = "05/07/2024 01:02:07 م",
                             Name = "التجار",
                             NormalizedName = "التجار"
                         },
                         new
                         {
-                            Id = "aa2ac875-4170-4b7a-bf96-9acc831f30bb",
-                            Date = "18/06/2024 01:21:37 م",
+                            Id = "02ce01f9-6de7-4259-aa9e-79917498cf52",
+                            Date = "05/07/2024 01:02:07 م",
                             Name = "الموظفين",
                             NormalizedName = "الموظفين"
                         });
@@ -674,7 +676,7 @@ namespace Shipping.Migrations
                     b.Property<int>("Addition_Cost")
                         .HasColumnType("int");
 
-                    b.Property<int>("Cost")
+                    b.Property<int>("StandaredWeight")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -685,8 +687,8 @@ namespace Shipping.Migrations
                         new
                         {
                             Id = 1,
-                            Addition_Cost = 100,
-                            Cost = 10
+                            Addition_Cost = 30,
+                            StandaredWeight = 10
                         });
                 });
 
@@ -800,6 +802,14 @@ namespace Shipping.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Shipping.Models.City", "City")
+                        .WithMany()
+                        .HasForeignKey("CityId");
+
+                    b.HasOne("Shipping.Models.Government", "Government")
+                        .WithMany()
+                        .HasForeignKey("GovernmentId");
+
                     b.HasOne("Shipping.Models.AppUser", "User")
                         .WithMany("Merchants")
                         .HasForeignKey("UserId")
@@ -807,6 +817,10 @@ namespace Shipping.Migrations
                         .IsRequired();
 
                     b.Navigation("Branch");
+
+                    b.Navigation("City");
+
+                    b.Navigation("Government");
 
                     b.Navigation("User");
                 });

@@ -131,7 +131,9 @@ namespace Shipping.Models
             modelBuilder.Entity<WeightSetting>().HasData(
                 new WeightSetting
                 {
-                    Id = 1
+                    Id = 1,
+                    StandaredWeight=10,
+                    Addition_Cost=30
                 }
                 );
             #endregion

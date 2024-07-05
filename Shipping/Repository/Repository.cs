@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using NuGet.Versioning;
 using System.Linq.Expressions;
 
-namespace Shipping.Repository
+namespace Shipping.Repository.OrderRepo
 {
     public class Repository<TEntity> :IRepository<TEntity> where TEntity : class
     {
@@ -71,7 +71,6 @@ namespace Shipping.Repository
             }
             throw new InvalidOperationException("Entity does not contain properties named 'Id'.");
         }
-
 
         public async Task AddAsync(TEntity entity)
         {
