@@ -9,6 +9,7 @@
         public string email { get; set; }
         public string phone { get; set; }
         public string role { get; set; }
+        public string roleId { get; set; }
         public bool status { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Shipping.DTO.AccountDTOs;
 using Shipping.DTO.MerchantDTOs;
 using Shipping.Models;
 using Shipping.Repository.MerchantRepository;
@@ -47,7 +48,7 @@ public class MerchantRepository : IMerchantRepository
         {
             throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
-
+        await _userManager.AddToRoleAsync(user, "التجار");
         var branch = await _context.Branches.FirstOrDefaultAsync(b => b.Name == newMerchant.branchName);
         if (branch == null)
         {
@@ -80,12 +81,10 @@ public class MerchantRepository : IMerchantRepository
                 Government=op.Government,
                 City=op.City,
                 Price=op.Price
-                
             }).ToList()
-
+            
 
         };
-
         _context.Merchants.Add(merchant);
         await _context.SaveChangesAsync();
 

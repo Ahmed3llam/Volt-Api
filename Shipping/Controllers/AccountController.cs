@@ -24,12 +24,14 @@ namespace Shipping.Controllers
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly RoleManager<UserRole> _roleManager;
         private readonly IMapper _mapper;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,IMapper mapper)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, RoleManager<UserRole> roleManager, IMapper mapper)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _roleManager = roleManager;
             _mapper = mapper;
         }
 
@@ -50,8 +52,11 @@ namespace Shipping.Controllers
                 }
 
                 var result = await _signInManager.PasswordSignInAsync(user, login.password, login.rememberMe, false);
+                var roles = await _userManager.GetRolesAsync(user);
+                var roleName = roles.FirstOrDefault();
                 var userClaims = await _userManager.GetClaimsAsync(user);
                 userClaims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
+                userClaims.Add(new Claim(ClaimTypes.Role, roleName));
 
                 string key = "Iti Pd And Bi 44 Menoufia Shipping System For GP";
                 var secertkey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key));
@@ -64,11 +69,12 @@ namespace Shipping.Controllers
                 );
 
                 var tokenstring = new JwtSecurityTokenHandler().WriteToken(token);
-                var roles = await _userManager.GetRolesAsync(user);
                 if (result.Succeeded)
                 {
+                    var role = await _roleManager.FindByNameAsync(roleName);
                     var UserData = _mapper.Map<UserDTO>(user);
                     UserData.role = roles.FirstOrDefault();
+                    UserData.roleId = role?.Id;
                     UserData.token = tokenstring;
                     return Ok(new { message = "تم تسجيل الدخول",User= UserData });
                 }
@@ -102,7 +108,9 @@ namespace Shipping.Controllers
         [SwaggerResponse(StatusCodes.Status401Unauthorized, "User not found.")]
         public async Task<IActionResult> ChangePassword(PasswordDTO password)
         {
-            var user = await _userManager.GetUserAsync(User);
+            var userClaims = ReturnUser(HttpContext);
+            var userId = userClaims.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return Unauthorized(new { message = "هذا المستخدم غير موجود" });
@@ -129,5 +137,39 @@ namespace Shipping.Controllers
             }
         }
         #endregion
+
+        private ClaimsPrincipal ReturnUser(HttpContext context)
+        {
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            {
+                // Handle missing or invalid Authorization header
+                throw new UnauthorizedAccessException("Missing or invalid Authorization header.");
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            var handler = new JwtSecurityTokenHandler();
+            ClaimsPrincipal user;
+
+            try
+            {
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,  // Set to true if you need to validate issuer
+                    ValidateAudience = false, // Set to true if you need to validate audience
+                    ValidateIssuerSigningKey = true, // Ensure issuer signing key is validated
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Iti Pd And Bi 44 Menoufia Shipping System For GP")),
+
+                };
+
+                user = handler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            }
+            catch (Exception ex)
+            {
+                throw new UnauthorizedAccessException("Invalid token.", ex);
+            }
+
+            return user;
+        }
     }
 }

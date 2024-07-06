@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Authentication.OAuth.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
+using Microsoft.IdentityModel.Tokens;
 using Shipping.Constants;
 using Shipping.DTO.BranchDTOs;
 using Shipping.DTO.CityDTO;
@@ -15,8 +19,10 @@ using Shipping.Repository.OrderRepo;
 using Shipping.UnitOfWork;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using static Shipping.Constants.Permissions;
 
@@ -123,7 +129,7 @@ namespace Shipping.Controllers
         {
             try
             {
-              List<Order> orders = new List<Order>();   
+                List<Order> orders = new List<Order>();   
                 var deliveries = await _unit.DeliveryRepository.GetAll(query);
 
                 if (string.IsNullOrWhiteSpace(query))
@@ -238,7 +244,9 @@ namespace Shipping.Controllers
             {
                 try
                 {
-                    var user = await _userManager.GetUserAsync(User);
+                    var userClaims = ReturnUser(HttpContext);
+                    var userId = userClaims.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var user = await _userManager.FindByIdAsync(userId);
                     var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                     if (order == null)
                         return NotFound(new { message = "الطلب غير موجود."});
@@ -277,8 +285,10 @@ namespace Shipping.Controllers
 
             try
             {
-                //var user = await _userManager.GetUserAsync(User);
-                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, "76f86073-b51c-47c4-b7fa-731628055ebb");
+                var user = ReturnUser(HttpContext);
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, userId);
                 if (addedOrder == null)
                 {
                     return BadRequest(new { message =  "فشل في إضافة الطلب."});
@@ -329,7 +339,7 @@ namespace Shipping.Controllers
         [HttpGet("GetCitiesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves cities based on government ID.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of cities.")]
-        [Permission(Permissions.Orders.Create)]
+        [Permission(Permissions.Cities.View)]
         public IActionResult GetCitiesByGovernment(int governmentId)
         {
             try
@@ -349,7 +359,7 @@ namespace Shipping.Controllers
         [HttpGet("GetBranchesByGovernment")]
         [SwaggerOperation(Summary = "Retrieves branches based on government name.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of branches.")]
-        [Permission(Permissions.Orders.Create)]
+        [Permission(Permissions.Branches.View)]
         public async Task<IActionResult> GetBranchesByGovernmentAsync(int government)
         {
             try
@@ -374,8 +384,10 @@ namespace Shipping.Controllers
         {
             try
             {
-                  var roleName = User.FindFirstValue(ClaimTypes.Role);
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = ReturnUser(HttpContext);
+                var roleName = user.FindFirstValue(ClaimTypes.Role);
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+                
                 var orders = await _unit.OrderRepository.GetAllOrdersAsync();
 
                 if (roleName == "Admin" || roleName == "الموظفين")
@@ -404,7 +416,42 @@ namespace Shipping.Controllers
         }
         #endregion
 
-       #region Get Orders After Filter
+        private ClaimsPrincipal ReturnUser(HttpContext context)
+        {
+            var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+            {
+                // Handle missing or invalid Authorization header
+                throw new UnauthorizedAccessException("Missing or invalid Authorization header.");
+            }
+
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            var handler = new JwtSecurityTokenHandler();
+            ClaimsPrincipal user;
+
+            try
+            {
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,  // Set to true if you need to validate issuer
+                    ValidateAudience = false, // Set to true if you need to validate audience
+                    ValidateIssuerSigningKey = true, // Ensure issuer signing key is validated
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Iti Pd And Bi 44 Menoufia Shipping System For GP")),
+                                                                                                                
+                };
+
+                user = handler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+            }
+            catch (Exception ex)
+            {
+                throw new UnauthorizedAccessException("Invalid token.", ex);
+            }
+
+            return user;
+        }
+
+
+        #region Get Orders After Filter
         [HttpGet("IndexAfterFilter")]
         [SwaggerOperation(Summary = "Retrieves orders based on status and user role.")]
         [SwaggerResponse(StatusCodes.Status200OK, "Returns a list of filtered orders.")]
@@ -413,10 +460,10 @@ namespace Shipping.Controllers
         {
             try
             {
-                //var roleName = User.FindFirstValue(ClaimTypes.Role);
-                //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                var roleName = "Admin";
-                var userId = "76f86073-b51c-47c4-b7fa-731628055ebb";
+                var user = ReturnUser(HttpContext);
+
+                var roleName = user.FindFirstValue(ClaimTypes.Role);
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 var orders = await _unit.OrderRepository.GetAllOrdersAsync();
 
@@ -446,7 +493,11 @@ namespace Shipping.Controllers
                     return Forbid();
                 }
             }
-            catch
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception)
             {
                 return StatusCode(500, "خطأ في جلب الطلبات بعد الفلترة.");
             }
