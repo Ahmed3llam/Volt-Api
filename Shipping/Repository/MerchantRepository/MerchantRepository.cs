@@ -22,7 +22,7 @@ public class MerchantRepository : IMerchantRepository
 
     public async Task<List<Merchant>> GetAllMerchants()
     {
-        return await _context.Merchants      
+        return await _context.Merchants.Where(m=>m.User.IsDeleted==false)     
             .ToListAsync();
     }
 
@@ -145,16 +145,18 @@ public class MerchantRepository : IMerchantRepository
 
         merchant.PickUpSpecialCost = newData.pickUpSpecialCost;
         merchant.RefusedOrderPercent = newData.refusedOrderPercent;
-        merchant.SpecialCitiesPrices = newData.SpecialCitiesPrices.Select
+        if (merchant.SpecialCitiesPrices == null)
+        {
+            merchant.SpecialCitiesPrices = new List<SpecialCitiesPrice>();
+        }
 
-
-          (op => new SpecialCitiesPrice
-          {
-              Government = op.Government,
-              City = op.City,
-              Price = op.Price
-
-          }).ToList();
+        merchant.SpecialCitiesPrices.Clear();
+        merchant.SpecialCitiesPrices.AddRange(newData.SpecialCitiesPrices.Select(op => new SpecialCitiesPrice
+        {
+            Government = op.Government,
+            City = op.City,
+            Price = op.Price
+        }));
 
         _context.Merchants.Update(merchant);
         await _context.SaveChangesAsync();
@@ -173,6 +175,7 @@ public class MerchantRepository : IMerchantRepository
     public async Task SoftDeleteAsync(Merchant merchant)
     {
         merchant.User.Status = false;
+        merchant.User.IsDeleted = true;
         _context.Merchants.Update(merchant);
         await _context.SaveChangesAsync();
     }
