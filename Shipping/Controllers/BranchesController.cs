@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Shipping.Controllers
 {
     [Route("api/[controller]")]
-    //[ApiController]
+    [ApiController]
     public class BranchController : ControllerBase
     {
         private readonly IBranchRepository _branchRepository;
@@ -60,7 +60,7 @@ namespace Shipping.Controllers
 
             if (branch == null)
             {
-                return NotFound("الفرع غير موجود");
+                return NotFound(new { message = "الفرع غير موجود" });
             }
 
             var branchDTO = _mapper.Map<BranchDTO>(branch);
@@ -86,7 +86,7 @@ namespace Shipping.Controllers
             await _branchRepository.AddAsync(branch);
 
             var createdDto = _mapper.Map<BranchDTO>(branch);
-            return CreatedAtAction(nameof(GetBranchById), new { id = createdDto.Id }, $"تمت إضافة الفرع بنجاح. معرف الفرع الجديد: {createdDto.Id}");
+            return CreatedAtAction(nameof(GetBranchById), new { id = createdDto.Id }, new { message = $"تمت إضافة الفرع بنجاح. معرف الفرع الجديد: {createdDto.Id}"});
         }
         #endregion
 
@@ -145,13 +145,13 @@ namespace Shipping.Controllers
             var branch = await _branchRepository.GetByIdAsync(id);
             if (branch == null)
             {
-                return NotFound("الفرع غير موجود");
+                return NotFound(new { message = "الفرع غير موجود" });
             }
 
             try
             {
                 await _branchRepository.DeleteAsync(id);
-                return Ok("تم حذف الفرع بنجاح");
+                return Ok(new { message = "تم حذف الفرع بنجاح" });
             }
             catch (Exception ex)
             {
@@ -175,7 +175,7 @@ namespace Shipping.Controllers
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                return BadRequest("يرجى إدخال نص للبحث.");
+                return BadRequest(new { message = "يرجى إدخال نص للبحث." });
             }
 
             var branches = await _branchRepository.SearchAsync(query);

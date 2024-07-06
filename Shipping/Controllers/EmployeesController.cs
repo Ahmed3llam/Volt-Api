@@ -38,7 +38,7 @@ namespace Shipping.Controllers
             {
                 var employees = await _unit.EmployeeRepository.GetAllEmployees();
                 if (!employees.Any())
-                    return NotFound("لا يوجد موظفين");
+                    return NotFound(new { message = "لا يوجد موظفين" });
 
                 int totalCount = employees.Count;
                 var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
@@ -77,7 +77,7 @@ namespace Shipping.Controllers
             {
                 var employee = await _unit.EmployeeRepository.GetEmployeeByIdAsync(id);
                 if (employee == null)
-                    return NotFound($" لا يوجد موظف هذا الرقم");
+                    return NotFound(new { message = $" لا يوجد موظف هذا الرقم" });
 
                 var employeeDto = _mapper.Map<EmpDTO>(employee);
                 var roles = await _userManager.GetRolesAsync(employee.User);
@@ -105,7 +105,7 @@ namespace Shipping.Controllers
             {
                 var employees = _unit.EmployeeRepository.Search(query);
                 if (employees == null || !employees.Any())
-                    return NotFound("لا يوجد موظفين يتوافقوا مع بحثك");
+                    return NotFound(new { message = "لا يوجد موظفين يتوافقوا مع بحثك" });
 
                 var employeesList = _mapper.Map<List<EmpDTO>>(employees);
 
@@ -138,7 +138,7 @@ namespace Shipping.Controllers
             try
             {
                 if (id != employeeDto.id)
-                    return BadRequest("الرقم الخاص بالموظف غير متطابق");
+                    return BadRequest(new { message = "الرقم الخاص بالموظف غير متطابق" });
 
                 var updated = await _unit.EmployeeRepository.Update(employeeDto, _userManager);
                 _unit.SaveChanges();
@@ -195,7 +195,7 @@ namespace Shipping.Controllers
             {
                 var employee = await _unit.EmployeeRepository.GetEmployeeByIdAsync(id);
                 if (employee == null)
-                    return NotFound($"لا يوجد موظف يحمل هذا الرقم");
+                    return NotFound(new { message = $"لا يوجد موظف يحمل هذا الرقم" });
 
                 var updated = await _unit.EmployeeRepository.UpdateStatus(employee, status);
                 _unit.SaveChanges();
@@ -226,7 +226,7 @@ namespace Shipping.Controllers
             {
                 var employee = await _unit.EmployeeRepository.GetEmployeeByIdAsync(id);
                 if (employee == null)
-                    return NotFound($"لا يوجد موظف يحمل هذا الرقم");
+                    return NotFound(new { message = $"لا يوجد موظف يحمل هذا الرقم" });
 
                 await _unit.EmployeeRepository.SoftDeleteAsync(employee);
                 _unit.SaveChanges();

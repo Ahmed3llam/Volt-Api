@@ -4,7 +4,7 @@ namespace Shipping.DTO.BranchDTOs
 {
     public class BranchDTO
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public int? StateId { get; set; }
         public string Name { get; set; }
         public DateTime? Date { get; set; }= DateTime.UtcNow;
