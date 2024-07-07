@@ -40,41 +40,19 @@ To run the system locally:
 1. **Clone the repository:**
 
     ```sh
-    git clone https://github.com/yourusername/transport-company-system.git
+    git clone https://github.com/Ahmed3llam/Volt-Api.git
     ```
 
-2. **Install dependencies:**
-
-    In the frontend directory:
-    ```sh
-    npm install
-    ```
-
-    In the backend directory:
-    ```sh
-    dotnet restore
-    ```
-
-3. **Update the database:**
+2. **Update the database:**
 
     ```sh
-    dotnet ef database update
+    update-database
     ```
 
-4. **Run the backend server:**
-
-    ```sh
-    dotnet run
-    ```
-
-5. **Run the frontend server:**
-
-    ```sh
-    ng serve
-    ```
 
 ## Future Features
 
+- Automated notifications (SignalR)
 - Adding detailed reports for order operations.
 - Multi-language support.
 - Enhancing the user interface for a better user experience.
