@@ -37,6 +37,7 @@ namespace Shipping.Controllers
         private readonly IUnitOfWork<Order> _unit;
         private readonly IUnitOfWork<WeightSetting> _WeightSettingUnit;
         private readonly IUnitOfWork<SpecialCitiesPrice> _SpecialCityPriceUnit;
+        private readonly IUnitOfWork<City> _CityUnit;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<UserRole> _roleManager;
         private readonly ShippingContext _myContext;
@@ -45,6 +46,7 @@ namespace Shipping.Controllers
         public OrderController(ShippingContext myContext,
             IUnitOfWork<WeightSetting> weightSettingUnit,
             IUnitOfWork<SpecialCitiesPrice> specialCityPriceUnit,
+            IUnitOfWork<City> cityUnit,
             IUnitOfWork<Order> unit,
             UserManager<AppUser> userManager,
             RoleManager<UserRole> roleManager,
@@ -54,6 +56,7 @@ namespace Shipping.Controllers
             _myContext = myContext;
             _WeightSettingUnit = weightSettingUnit;
             _SpecialCityPriceUnit = specialCityPriceUnit;
+            _CityUnit = cityUnit;
             _userManager = userManager;
             _roleManager = roleManager;
             _mapper = mapper;
@@ -258,13 +261,8 @@ namespace Shipping.Controllers
                     var order = await _unit.OrderRepository.GetOrderByIdAsync(id);
                     if (order == null)
                         return NotFound(new { message = "الطلب غير موجود."});
-                    double costDeliverToVillage = await Cost_DeliverToVillageAsync(orderDto.IsVillage, orderDto.OrderCost);
-                    double costAddititonalWeight = await Cost_AdditionalWeight(orderDto.TotalWeight);
-                    double costShippingType = await Cost_ShippingType(orderDto.ShippingType, orderDto.OrderCost);
-                    double cityShippingPrice = (double)await GetSpecialPricesWithMerchantandCityId(orderDto.MerchantId ?? 0, orderDto.CityName);
 
-                    orderDto.ShippingCost = (int)(costDeliverToVillage + costAddititonalWeight + cityShippingPrice + costShippingType);
-                    orderDto.TotalCost = orderDto.ShippingCost + orderDto.OrderCost;
+                    orderDto.ShippingCost = await _unit.OrderRepository.CalculateShippingPrice(orderDto,_CityUnit,_WeightSettingUnit,_SpecialCityPriceUnit);
                     await _unit.OrderRepository.EditOrderAsync(id, orderDto);
                     return Ok(new { message = " تم التعديل"});
                 }
@@ -305,13 +303,7 @@ namespace Shipping.Controllers
                 int merchantId = merchant.Id;
                 orderDTO.MerchantId = merchantId;
 
-                double costDeliverToVillage = await Cost_DeliverToVillageAsync(orderDTO.IsVillage, orderDTO.OrderCost);
-                double costAddititonalWeight = await Cost_AdditionalWeight(orderDTO.TotalWeight);
-                double costShippingType = await Cost_ShippingType(orderDTO.ShippingType,orderDTO.OrderCost);
-                double cityShippingPrice = (double)await GetSpecialPricesWithMerchantandCityId(orderDTO.MerchantId??0, orderDTO.CityName);
-
-                orderDTO.ShippingCost =(int) (costDeliverToVillage + costAddititonalWeight + cityShippingPrice + costShippingType);
-                orderDTO.TotalCost = orderDTO.ShippingCost + orderDTO.OrderCost;
+                orderDTO.ShippingCost = await _unit.OrderRepository.CalculateShippingPrice(orderDTO, _CityUnit, _WeightSettingUnit, _SpecialCityPriceUnit);
 
                 var addedOrder = await _unit.OrderRepository.AddOrderAsync(orderDTO, userId);
                 if (addedOrder == null)
@@ -528,84 +520,6 @@ namespace Shipping.Controllers
             }
         }
 
-        #endregion
-
-        #region calculate price
-        private async Task<double> CityShippingPrice(int cityId)
-        {
-            var result = _unit.CityRepository.GetById(cityId);
-            if (result != null)
-            {
-                return result.ShippingPrice;
-            }
-            return 0;
-        }
-
-        private async Task<double> Cost_DeliverToVillageAsync(bool isDeliverToVillage, double price)
-        {
-            if(isDeliverToVillage)
-            {
-                return price * 0.20;
-            }
-            return 0;
-        }
-
-        private async Task<double> Cost_ShippingType(ShippingType shippingType,double price)
-        {
-            if(shippingType == ShippingType.توصيل_سريع)
-            {
-                return price * 0.75;
-            }
-            else if(shippingType == ShippingType.توصيل_عادي)
-            {
-                return price * 0.20;
-            }
-            else if(shippingType == ShippingType.توصيل_في_نفس_اليوم)
-            {
-                return price * 0.50;
-            }
-            return 0;
-        }
-
-        private async Task<double> Cost_AdditionalWeight(double totalWeight)
-        {
-            double cost = 0;
-            double defaultWeight = 0;
-            double additionalPrice = 0;
-            WeightSetting result = await _WeightSettingUnit.Repository.GetByIdAsync(1);
-            if (result != null)
-            {
-                defaultWeight = result.StandaredWeight*1000;
-
-                if (totalWeight > defaultWeight)
-                {
-
-                    additionalPrice = result.Addition_Cost;
-
-                    totalWeight = totalWeight - defaultWeight;
-
-                    cost = totalWeight * additionalPrice;
-                }
-            }
-
-            return cost;
-        }
-
-        private async Task<decimal> GetSpecialPricesWithMerchantandCityId(int merchantId, string city)
-        {
-            decimal totalPrice = 0;
-            var result = await _SpecialCityPriceUnit.Repository.GetAllAsync();
-            if (result != null)
-            {
-                var specialPrices = result.Where(sp => sp.City == city && sp.MerchantId == merchantId).FirstOrDefault();
-                if (specialPrices != null)
-                {
-                    totalPrice = specialPrices.Price;
-                }
-            }
-            return totalPrice;
-
-        }
         #endregion
     }
 }

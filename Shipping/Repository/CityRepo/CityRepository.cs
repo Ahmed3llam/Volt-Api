@@ -38,6 +38,13 @@ namespace Shipping.Repository.CityRepo
                 .ToList();
         }
 
+        public City GetByName(string city)
+        {
+            return _myContext.Cities
+                .Where(c => c.Name == city && !c.IsDeleted)
+                .FirstOrDefault();
+        }
+
         public void Update(int id, City city)
         {
             var oldCity = GetById(id);

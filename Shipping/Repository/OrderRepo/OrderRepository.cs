@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Shipping.DTO.OrderDTO;
 using Shipping.Models;
+using Shipping.UnitOfWork;
+using static Shipping.Constants.Permissions;
 
 namespace Shipping.Repository.OrderRepo
 {
@@ -113,7 +115,7 @@ namespace Shipping.Repository.OrderRepo
                 _myContext.Orders.Add(order);
                 await _myContext.SaveChangesAsync();
 
-              
+
 
                 return order;
             }
@@ -226,6 +228,112 @@ namespace Shipping.Repository.OrderRepo
                 throw new Exception("خطأ في حذف الطلب.", ex);
             }
         }
+
+        public async Task<int> CalculateShippingPrice(OrderDTO order,IUnitOfWork<City> _city, IUnitOfWork<WeightSetting> _WeightSettingUnit, IUnitOfWork<SpecialCitiesPrice> _SpecialCityPriceUnit)
+        {
+            int shippingPrice = 0;
+            int merchant = order.MerchantId ?? 0;
+            SpecialCitiesPrice SpecialPrice = await GetSpecialPrices(merchant, order.CityName, _SpecialCityPriceUnit);
+            if (SpecialPrice != null)
+                shippingPrice += SpecialPrice.Price;
+            else
+            {
+                shippingPrice += await CityShippingPrice(order, _city);
+            }
+            shippingPrice += await CostToVillage(order.IsVillage, order.OrderCost);
+            shippingPrice += (int) await CostShippingType(order.ShippingType, order.OrderCost);
+            shippingPrice += (int) await CostAdditionalWeight(order.TotalWeight, _WeightSettingUnit);
+            //shippingPrice += (int) await CostPaymentType(order.PaymentType, order.OrderCost);
+            return shippingPrice;
+
+        }
+
+
+        #region calculate price
+        private async Task<SpecialCitiesPrice> GetSpecialPrices(int merchantId, string city, IUnitOfWork<SpecialCitiesPrice> _SpecialCityPriceUnit)
+        {
+            var result = await _SpecialCityPriceUnit.Repository.GetAllAsync();
+            if (result != null)
+            {
+                var specialPrices = result.Where(sp => sp.City == city && sp.MerchantId == merchantId).FirstOrDefault();
+                return specialPrices;
+            }
+            return null;
+        }
+        private async Task<int> CityShippingPrice(OrderDTO order, IUnitOfWork<City> _unit)
+        {
+            var result = _unit.CityRepository.GetByName(order.CityName);
+            if (result != null)
+            {
+                if (order.Type == Models.Type.تسليم_فالفرع)
+                    return result.PickUpPrice;
+
+                else if (order.Type == Models.Type.توصيل_الي_المنزل)
+                    return result.ShippingPrice;
+            }
+            return 0;
+        }
+        private async Task<int> CostToVillage(bool isDeliverToVillage, double price)
+        {
+            if (isDeliverToVillage)
+            {
+                return (int)(price * 0.20);
+            }
+            return 0;
+        }
+        private async Task<double> CostShippingType(ShippingType shippingType, double price)
+        {
+            if (shippingType == ShippingType.توصيل_سريع)
+            {
+                return price * 0.75;
+            }
+            else if (shippingType == ShippingType.توصيل_عادي)
+            {
+                return 0;
+            }
+            else if (shippingType == ShippingType.توصيل_في_نفس_اليوم)
+            {
+                return price * 0.50;
+            }
+            return 0;
+        }
+        private async Task<double> CostAdditionalWeight(double totalWeight, IUnitOfWork<WeightSetting> _WeightSettingUnit)
+        {
+            double cost = 0;
+            double defaultWeight = 0;
+            double additionalPrice = 0;
+            WeightSetting result = await _WeightSettingUnit.Repository.GetByIdAsync(1);
+            if (result != null)
+            {
+                defaultWeight = result.StandaredWeight;
+                totalWeight = totalWeight / 1000;
+                if (totalWeight > defaultWeight)
+                {
+                    additionalPrice = result.Addition_Cost;
+                    totalWeight = totalWeight - defaultWeight;
+                    cost = totalWeight * additionalPrice;
+                }
+            }
+            return cost;
+        }
+        private async Task<double> CostPaymentType(PaymentType paymentType, double price)
+        {
+            if (paymentType == PaymentType.دفع_مقدم)
+            {
+                return 0;
+            }
+            else if (paymentType == PaymentType.واجبة_التحصيل)
+            {
+                return 0;
+            }
+            else if (paymentType == PaymentType.طرد_مقابل_طرد)
+            {
+                return 0;
+            }
+            return 0;
+        }
+
+        #endregion
 
         // under 
         public async Task<List<string>> GenerateTableAsync(OrdersPlusDeliveriesDTO ordersPlusDeliveriesDTO)
