@@ -116,6 +116,8 @@ internal class Program
         });
         builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
         builder.Services.AddScoped<IUnitOfWork<Order>, UnitOfWork<Order>>();
+        builder.Services.AddScoped<IUnitOfWork<WeightSetting>, UnitOfWork<WeightSetting>>();
+        builder.Services.AddScoped<IUnitOfWork<SpecialCitiesPrice>, UnitOfWork<SpecialCitiesPrice>>();
         builder.Services.AddScoped<IUnitOfWork<City>, UnitOfWork<City>>();
         builder.Services.AddScoped<IUnitOfWork<Government>, UnitOfWork<Government>>();
         builder.Services.AddScoped<IUnitOfWork<Delivery>, UnitOfWork<Delivery>>();

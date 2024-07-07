@@ -72,19 +72,15 @@ namespace Shipping.Repository.OrderRepo
             try
             {
                 var city = await _myContext.Cities.FirstOrDefaultAsync(c => c.Name == Order.CityName);
-                var merchantId = await _myContext.Merchants
-                    .Where(m => m.UserId == userId)
-                    .Select(m => m.Id)
-                    .FirstOrDefaultAsync();
 
                 if (city == null)
                     throw new Exception("المدينة غير موجودة.");
-                if (merchantId == 0)
+                if (Order.MerchantId == 0)
                     throw new Exception("التاجر غير موجود.");
 
                 var order = new Order
                 {
-                    MerchantId = merchantId,
+                    MerchantId = Order.MerchantId ?? 0,
                     CityId = city.Id,
                     IsVillage = Order.IsVillage,
                     ClientEmail = Order.ClientEmail,
